@@ -1,0 +1,33 @@
+version: '3'
+
+tasks:
+  default:
+    desc: Show public agency website tasks
+    cmds:
+      - task --list
+
+  dev:
+    desc: Start the static-site development server
+    cmds:
+      - npm run dev
+
+  typecheck:
+    desc: Type-check the public agency website
+    cmds:
+      - npm run typecheck
+
+  build:
+    desc: Build the static website into out/
+    cmds:
+      - npm run build
+
+  start:
+    desc: Serve the production build through Next.js for local inspection
+    cmds:
+      - npm run start
+
+  check:
+    desc: Type-check and build the public agency website
+    cmds:
+      - task: typecheck
+      - task: build
