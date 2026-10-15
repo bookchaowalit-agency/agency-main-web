@@ -1,21 +1,29 @@
 import type { Metadata } from 'next';
-import { Noto_Sans_Thai, Noto_Serif_Thai } from 'next/font/google';
+import localFont from 'next/font/local';
 import type { ReactNode } from 'react';
 import './globals.css';
 import { siteConfig } from '@/lib/site-config';
 
-const sans = Noto_Sans_Thai({
-  subsets: ['thai'],
-  weight: ['400', '500', '600', '700'],
+const notoSansThai = localFont({
+  src: [
+    { path: './fonts/NotoSansThai-Variable.woff2', weight: '400', style: 'normal' },
+    { path: './fonts/NotoSansThai-Variable.woff2', weight: '500', style: 'normal' },
+    { path: './fonts/NotoSansThai-Variable.woff2', weight: '600', style: 'normal' },
+    { path: './fonts/NotoSansThai-Variable.woff2', weight: '700', style: 'normal' },
+  ],
   variable: '--font-sans-thai',
   display: 'swap',
 });
 
-const serif = Noto_Serif_Thai({
-  subsets: ['thai'],
-  weight: ['400', '600', '700'],
+const notoSerifThai = localFont({
+  src: [
+    { path: './fonts/NotoSerifThai-Variable.woff2', weight: '400', style: 'normal' },
+    { path: './fonts/NotoSerifThai-Variable.woff2', weight: '600', style: 'normal' },
+    { path: './fonts/NotoSerifThai-Variable.woff2', weight: '700', style: 'normal' },
+  ],
   variable: '--font-serif-thai',
   display: 'swap',
+  adjustFontFallback: 'Times New Roman',
 });
 
 export const metadata: Metadata = {
@@ -41,7 +49,7 @@ export const metadata: Metadata = {
 
 export default function RootLayout({ children }: Readonly<{ children: ReactNode }>) {
   return (
-    <html lang="th" className={`${sans.variable} ${serif.variable}`}>
+    <html lang="th" className={`${notoSansThai.variable} ${notoSerifThai.variable}`}>
       <body>
         <a className="skip-link" href="#main-content">ข้ามไปเนื้อหาหลัก</a>
         {children}
