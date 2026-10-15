@@ -11,6 +11,11 @@ tasks:
     cmds:
       - npm run dev
 
+  test:
+    desc: Test showcase generation and font packaging
+    cmds:
+      - npm run test
+
   typecheck:
     desc: Type-check the public agency website
     cmds:
@@ -27,7 +32,8 @@ tasks:
       - npm run start
 
   check:
-    desc: Type-check and build the public agency website
+    desc: Test, type-check and build the public agency website
     cmds:
+      - task: test
       - task: typecheck
       - task: build
