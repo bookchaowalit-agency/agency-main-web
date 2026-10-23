@@ -17,12 +17,15 @@ const typescript = require('typescript');
 const here = dirname(fileURLToPath(import.meta.url));
 const baseRepo = join(here, '..');
 const outputRoot = join(baseRepo, '..');
+const siteTemplate = join(baseRepo, 'templates', 'site');
+const templateFile = (path) => readFileSync(join(siteTemplate, path), 'utf8');
 
-const statusLabels = {
-  incubating: 'กำลังเปิดรอบ validation',
-  target: 'เตรียมไว้ใน portfolio',
-  locked: 'future capability',
-};
+const headingSpacingCss = `
+/* Thai tone marks sit above the tight .98 line box: give large section headings room below their eyebrow,
+   and keep the readiness gate off the deliverables grid (its padding shorthand drops .pseo-section's top padding). */
+.pseo-section-heading h2, .pseo-readiness h2, .pseo-card h2 { margin-top: .32em; }
+.pseo-readiness { margin-top: clamp(40px, 6vw, 72px); }
+`;
 
 const pseoCss = `
 /* pSEO service pages: one bounded, inspectable offer per vertical. */
@@ -128,53 +131,7 @@ async function readSourceModules() {
 }
 
 function siteConfigTemplate() {
-  return `import type { Metadata } from 'next';
-import { site } from '@/lib/site';
-
-const configuredUrl = process.env.NEXT_PUBLIC_SITE_URL?.trim();
-
-function parsePublicUrl(value: string | undefined) {
-  if (!value) return undefined;
-  try {
-    const url = new URL(value);
-    if (url.protocol !== 'https:' && url.protocol !== 'http:') return undefined;
-    return url.toString().replace(/\\/$/, '');
-  } catch {
-    return undefined;
-  }
-}
-
-const publicUrl = parsePublicUrl(configuredUrl);
-
-export const siteConfig = {
-  name: site.name,
-  description: site.promise,
-  publicUrl,
-  metadataUrl: publicUrl ?? 'http://localhost:3010',
-  isIndexable: Boolean(publicUrl) && process.env.NEXT_PUBLIC_SITE_INDEXABLE === 'true',
-} as const;
-
-export function absoluteUrl(path: string) {
-  const normalizedPath = path.startsWith('/') ? path : '/' + path;
-  return siteConfig.metadataUrl + normalizedPath;
-}
-
-export function canonicalUrl(path: string) {
-  return siteConfig.publicUrl ? absoluteUrl(path) : undefined;
-}
-
-export function pageMetadata(title: string, description: string, path: string): Metadata {
-  const canonical = canonicalUrl(path);
-  return {
-    title,
-    description,
-    openGraph: { type: 'website', title, description, siteName: site.name },
-    twitter: { card: 'summary', title, description },
-    ...(canonical ? { alternates: { canonical } } : {}),
-    robots: siteConfig.isIndexable ? { index: true, follow: true } : { index: false, follow: false },
-  };
-}
-`;
+  return templateFile('lib/site-config.ts');
 }
 
 function layoutTemplate() {
@@ -268,59 +225,7 @@ export const pseoService: PseoService = ${JSON.stringify(record, null, 2)};
 }
 
 function componentTemplate() {
-  return `import Link from 'next/link';
-import { site } from '@/lib/site';
-import { pseoService, type PseoService } from '@/lib/pseo';
-import { absoluteUrl, siteConfig } from '@/lib/site-config';
-
-const statusCopy = {
-  incubating: { label: 'กำลังเปิดรอบ validation', note: 'กำลังทดสอบ buyer, offer และ delivery economics ก่อนเปิดรับงานในขอบเขตที่ชัดเจน' },
-  target: { label: 'เตรียมไว้ใน portfolio', note: 'positioning พร้อมสำหรับการทดสอบ แต่ owner และหลักฐานการส่งมอบยังต้องผ่าน gate ก่อนเปิดรับงาน' },
-  locked: { label: 'future capability', note: 'เก็บไว้สำหรับการวิจัยและวางพันธมิตร ยังไม่มีการรับข้อมูลหรือรับประกันบริการ' },
-} as const;
-
-function structuredData(service: PseoService) {
-  const canonical = siteConfig.publicUrl ? absoluteUrl('/services/' + service.slug) : undefined;
-  return JSON.stringify([
-    {
-      '@context': 'https://schema.org',
-      '@type': 'Service',
-      name: service.title,
-      description: service.context,
-      serviceType: service.name,
-      inLanguage: 'th',
-      ...(canonical ? { url: canonical } : {}),
-      provider: { '@type': 'Organization', name: 'Solo Empire Group' },
-    },
-    {
-      '@context': 'https://schema.org',
-      '@type': 'BreadcrumbList',
-      itemListElement: [
-        { '@type': 'ListItem', position: 1, name: 'Services', ...(siteConfig.publicUrl ? { item: absoluteUrl('/services') } : {}) },
-        { '@type': 'ListItem', position: 2, name: service.title, ...(canonical ? { item: canonical } : {}) },
-      ],
-    },
-  ]).replace(/</g, '\\\\u003c');
-}
-
-export function PseoHeader() {
-  return <header className="pseo-header"><Link className="pseo-brand" href="/"><span className="pseo-brand-mark" aria-hidden="true">{String(site.number).padStart(2, '0')}</span><span><strong>{site.name}</strong><small>{site.thaiName}</small></span></Link><nav className="pseo-nav" aria-label="เมนู service"><Link href="/">Showcase</Link><Link href={\`/services/\${pseoService.slug}\`}>Service</Link></nav></header>;
-}
-
-export function PseoLandingPage({ service = pseoService }: { service?: PseoService }) {
-  const readiness = statusCopy[service.agencyStatus];
-  const structuredDataJson = structuredData(service);
-  return <div className="pseo-shell"><PseoHeader /><main id="main-content" className="pseo-main">
-    <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: structuredDataJson }} />
-    <div className="pseo-breadcrumb"><Link href="/services">Service</Link><span>/</span><strong>{service.name}</strong></div>
-    <section className="pseo-hero" aria-labelledby="pseo-title"><div><p className="pseo-eyebrow">SERVICE / {service.agencyName.toUpperCase()}</p><h1 id="pseo-title">{service.title}</h1><p className="pseo-lede">{service.context}</p><div className="pseo-actions"><Link className="pseo-button" href="/">กลับไปดู showcase</Link><Link className="pseo-text-link" href="#readiness">ดู readiness gate ↓</Link></div></div><aside className="pseo-aside"><p className="pseo-eyebrow">SEARCH INTENT</p><strong>{service.intent}</strong><dl><div><dt>เหมาะกับ</dt><dd>{service.buyer}</dd></div><div><dt>สถานะ</dt><dd>{readiness.label}</dd></div></dl></aside></section>
-    <section className="pseo-section" aria-labelledby="workflow-title"><div className="pseo-section-heading"><div><p className="pseo-eyebrow">HOW WE START</p><h2 id="workflow-title">เริ่มจาก workflow เดียว</h2></div><p>ขอบเขตเล็กพอที่จะวัดผลและตรวจรับได้ ก่อนตัดสินใจขยายระบบ</p></div><ol className="pseo-steps">{service.workflow.map((step, index) => <li key={step}><span>{String(index + 1).padStart(2, '0')}</span><p>{step}</p></li>)}</ol></section>
-    <section className="pseo-section pseo-grid" aria-label="Deliverables and evidence"><article className="pseo-card pseo-card-dark"><p className="pseo-eyebrow">DELIVERABLES</p><h2>สิ่งที่จะได้</h2><ul>{service.deliverables.map((item) => <li key={item}>{item}</li>)}</ul></article><article className="pseo-card"><p className="pseo-eyebrow">EVIDENCE BOUNDARY</p><h2>สิ่งที่เราพูดได้ตรง ๆ</h2><ul>{service.evidence.map((item) => <li key={item}>{item}</li>)}</ul></article></section>
-    <section id="readiness" className="pseo-section pseo-readiness" aria-labelledby="readiness-title"><div><p className="pseo-eyebrow">READINESS GATE / {service.agencyStage}</p><h2 id="readiness-title">ก่อนเปิดรับ inquiry</h2></div><p>{service.readiness}</p></section>
-    <footer className="pseo-footer"><span>{site.name} · service page</span><span>{readiness.label} · public-safe · no inquiry intake</span></footer>
-  </main></div>;
-}
-`;
+  return templateFile('components/pseo-page.tsx');
 }
 
 function indexPageTemplate() {
@@ -391,13 +296,15 @@ export default function robots(): MetadataRoute.Robots {
 
 function patchHomePage(path, service) {
   const source = readFileSync(path, 'utf8');
-  if (source.includes(`/services/${service.slug}`)) return;
+  // Pages from templates/site/app/page.tsx already link the service page through pseoService.
+  if (source.includes(`/services/${service.slug}`) || source.includes('pseoService.slug')) return;
   const nav = '<nav aria-label="เมนูหลัก"><a href="#offer">Scope</a><a href="#readiness">Readiness</a></nav>';
-  const navReplacement = `<nav aria-label="เมนูหลัก"><a href="#offer">Scope</a><a href="#readiness">Readiness</a><a href="/services/${service.slug}">Service</a></nav>`;
+  const navReplacement = `<nav aria-label="เมนูหลัก"><a href="#offer">Scope</a><a href="#readiness">Readiness</a><Link href="/services/${service.slug}/">Service</Link></nav>`;
   const withNav = source.includes(nav) ? source.replace(nav, navReplacement) : source;
   const primary = '            <a className="primary-link" href="#offer">{site.cta}<span className="link-mark" aria-hidden="true" /></a>';
-  const primaryReplacement = primary + `\n            <a className="pseo-home-link" href="/services/${service.slug}">ดู service page <span aria-hidden="true">↗</span></a>`;
-  writeText(path, withNav.includes(primary) ? withNav.replace(primary, primaryReplacement) : withNav);
+  const primaryReplacement = primary + `\n            <Link className="pseo-home-link" href="/services/${service.slug}/">ดู service page <span aria-hidden="true">↗</span></Link>`;
+  const linked = withNav.includes(primary) ? withNav.replace(primary, primaryReplacement) : withNav;
+  writeText(path, linked.includes("from 'next/link'") ? linked : "import Link from 'next/link';\n" + linked);
 }
 
 function verificationDoc(agency, service) {
@@ -415,9 +322,13 @@ function verificationDoc(agency, service) {
 ## Local checks
 
 \`\`\`bash
+npm run lint
 npm run typecheck
-npm run build
+npm test        # includes the noindex / Disallow default and the indexing switch (tests/site-config.test.ts)
+npm run check   # typecheck + static export
 \`\`\`
+
+CI runs the same checks through the shared workflow (\`.github/workflows/ci.yml\`) with a line-coverage gate.
 `;
 }
 
@@ -441,6 +352,7 @@ export async function migrateSites({ onlySlugs } = {}) {
     }
     writeText(join(target, 'lib', 'site-config.ts'), siteConfigTemplate());
     writeText(join(target, 'lib', 'pseo.ts'), pseoTypeScript(service, agency));
+    writeText(join(target, 'lib', 'readiness.ts'), templateFile('lib/readiness.ts'));
     writeText(join(target, 'components', 'pseo-page.tsx'), componentTemplate());
     writeText(join(target, 'app', 'layout.tsx'), layoutTemplate());
     writeText(join(target, 'app', 'services', 'page.tsx'), indexPageTemplate());
@@ -450,11 +362,12 @@ export async function migrateSites({ onlySlugs } = {}) {
 
     const cssPath = join(target, 'app', 'globals.css');
     const css = readFileSync(cssPath, 'utf8');
-    if (!css.includes('pSEO service pages:')) writeText(cssPath, css + pseoCss);
+    if (!css.includes('pSEO service pages:')) writeText(cssPath, css + pseoCss + headingSpacingCss);
     else {
       let updatedCss = css;
       if (!updatedCss.includes('.pseo-card-dark .pseo-eyebrow')) updatedCss += '\n.pseo-card-dark .pseo-eyebrow { color: var(--inverse-ink); }\n';
       if (!updatedCss.includes('.pseo-eyebrow, .pseo-aside dt, .pseo-steps li > span')) updatedCss += '\n.pseo-eyebrow, .pseo-aside dt, .pseo-steps li > span { color: var(--ink); }\n';
+      if (!updatedCss.includes('.pseo-readiness { margin-top:')) updatedCss += headingSpacingCss;
       if (updatedCss !== css) writeText(cssPath, updatedCss);
     }
     patchHomePage(join(target, 'app', 'page.tsx'), service);

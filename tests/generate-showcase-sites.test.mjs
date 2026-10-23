@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict';
 import { createHash } from 'node:crypto';
-import { cpSync, existsSync, mkdirSync, mkdtempSync, readdirSync, readFileSync, rmSync, symlinkSync } from 'node:fs';
+import { cpSync, existsSync, mkdirSync, mkdtempSync, readdirSync, readFileSync, rmSync, symlinkSync, unlinkSync } from 'node:fs';
 import { createRequire } from 'node:module';
 import { tmpdir } from 'node:os';
 import { join, relative } from 'node:path';
@@ -34,6 +34,54 @@ function checkFonts(site) {
   assert.deepEqual([...referenced].sort(), ['./fonts/NotoSansThai-Variable.woff2', './fonts/NotoSerifThai-Variable.woff2']);
 }
 
+function listFiles(directory, root = directory, result = []) {
+  for (const entry of readdirSync(directory, { withFileTypes: true })) {
+    const file = join(directory, entry.name);
+    if (entry.isDirectory()) listFiles(file, root, result);
+    else result.push(relative(root, file));
+  }
+  return result;
+}
+
+const templateRoot = join(sourceRoot, 'templates', 'site');
+// Rewritten by the pSEO migration after the copy (from the same template files, so they still match).
+const migratedFromTemplate = new Set(['lib/site-config.ts', 'components/pseo-page.tsx', 'lib/readiness.ts']);
+
+function checkSiteTemplate(site) {
+  for (const file of listFiles(templateRoot)) {
+    assert.equal(checksum(join(site, file)), checksum(join(templateRoot, file)), `${file} must come from templates/site${migratedFromTemplate.has(file) ? ' (via the migration)' : ''}`);
+  }
+  const pkg = JSON.parse(readFileSync(join(site, 'package.json'), 'utf8'));
+  const base = JSON.parse(readFileSync(join(sourceRoot, 'package.json'), 'utf8'));
+  assert.deepEqual(pkg.dependencies, base.dependencies, 'site dependencies must match the copied lockfile');
+  assert.deepEqual(pkg.devDependencies, base.devDependencies, 'site devDependencies must match the copied lockfile');
+  assert.equal(pkg.dependencies.next, '16.4.2');
+  assert.ok(!('eslint-config-next' in pkg.dependencies), 'eslint-config-next is a devDependency');
+  for (const script of ['lint', 'typecheck', 'test', 'check']) assert.ok(pkg.scripts[script], `missing ${script} script`);
+  const ci = readFileSync(join(site, '.github', 'workflows', 'ci.yml'), 'utf8');
+  assert.match(ci, /bookchaowalit\/platform-ci-workflows\/\.github\/workflows\/ci-node\.yml@[0-9a-f]{40}/);
+  assert.match(ci, /require-tests: true/);
+  assert.match(ci, /npm run check/);
+  assert.ok(existsSync(join(site, 'instrumentation-client.ts')), 'browser Sentry init');
+  assert.ok(!existsSync(join(site, 'instrumentation.ts')), 'static export: no server Sentry runtime');
+  assert.match(readFileSync(join(site, '.gitignore'), 'utf8'), /\*\.tsbuildinfo/);
+}
+
+// One generated site must pass its own lint, typecheck and tests with the shared node_modules.
+function checkSiteToolchain(site, run) {
+  symlinkSync(join(sourceRoot, 'node_modules'), join(site, 'node_modules'), 'dir');
+  const bin = (name) => join(sourceRoot, 'node_modules', name);
+  for (const [label, args] of [
+    ['tsc', [bin('typescript/bin/tsc'), '--noEmit', '-p', site]],
+    ['eslint', [bin('eslint/bin/eslint.js'), site]],
+    ['vitest', [bin('vitest/vitest.mjs'), 'run', '--root', site]],
+  ]) {
+    const result = run(args, site);
+    assert.equal(result.status, 0, `${label} failed in the generated site:\n${result.stdout}${result.stderr}`);
+  }
+  unlinkSync(join(site, 'node_modules'));
+}
+
 function snapshot(directory, result = {}, root = directory) {
   for (const entry of readdirSync(directory, { withFileTypes: true })) {
     const file = join(directory, entry.name);
@@ -48,13 +96,13 @@ test('showcase tools package local fonts and preserve existing targets', () => {
   const main = join(fixture, 'agency-main-web');
   try {
     mkdirSync(main);
-    for (const directory of ['scripts', 'lib', 'app/fonts', '.github']) {
+    for (const directory of ['scripts', 'lib', 'app/fonts', '.github', 'templates']) {
       if (existsSync(join(sourceRoot, directory))) cpSync(join(sourceRoot, directory), join(main, directory), { recursive: true });
     }
     for (const file of ['package.json', 'package-lock.json']) cpSync(join(sourceRoot, file), join(main, file));
     symlinkSync(join(sourceRoot, 'node_modules'), join(main, 'node_modules'), 'dir');
-    function run(args) {
-      const result = spawnSync(process.execPath, args, { cwd: main, env: { PATH: process.env.PATH, TMPDIR: fixture }, encoding: 'utf8' });
+    function run(args, cwd = main) {
+      const result = spawnSync(process.execPath, args, { cwd, env: { PATH: process.env.PATH, TMPDIR: fixture }, encoding: 'utf8' });
       if (result.error) throw result.error;
       return result;
     }
@@ -63,6 +111,8 @@ test('showcase tools package local fonts and preserve existing targets', () => {
     const sites = readdirSync(fixture).filter((name) => name.startsWith('agency-') && name.endsWith('-web') && name !== 'agency-main-web');
     assert.equal(sites.length, 14);
     for (const name of sites) checkFonts(join(fixture, name));
+    for (const name of sites) checkSiteTemplate(join(fixture, name));
+    checkSiteToolchain(join(fixture, 'agency-legal-web'), run);
 
     const before = Object.fromEntries(sites.map((name) => [name, snapshot(join(fixture, name))]));
     const refused = run(['scripts/generate-showcase-sites.mjs']);
