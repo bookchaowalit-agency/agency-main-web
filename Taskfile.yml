@@ -11,8 +11,13 @@ tasks:
     cmds:
       - npm run dev
 
+  lint:
+    desc: ESLint (eslint-config-next)
+    cmds:
+      - npm run lint
+
   test:
-    desc: Test showcase generation and font packaging
+    desc: Vitest (site logic, pages, Sentry) and the showcase generator test
     cmds:
       - npm run test
 
