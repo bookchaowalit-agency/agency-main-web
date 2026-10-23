@@ -2,13 +2,16 @@ import type { Metadata } from 'next';
 
 const configuredUrl = process.env.NEXT_PUBLIC_SITE_URL?.trim();
 
+// Accept only an absolute http(s) base URL and strip its trailing slashes. Paths are appended to this value, so a
+// query, fragment or user:password would end up inside every canonical and sitemap URL: reject those.
 function parsePublicUrl(value: string | undefined) {
   if (!value) return undefined;
 
   try {
     const url = new URL(value);
     if (url.protocol !== 'https:' && url.protocol !== 'http:') return undefined;
-    return url.toString().replace(/\/$/, '');
+    if (url.search || url.hash || url.username || url.password || /[?#]/.test(value)) return undefined;
+    return url.toString().replace(/\/+$/, '');
   } catch {
     return undefined;
   }
