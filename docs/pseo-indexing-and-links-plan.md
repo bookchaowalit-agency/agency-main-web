@@ -17,6 +17,27 @@ action จะลามถึงทุกเว็บใน account เดีย�
 | O4 | Analytics | PostHog EU (ใช้อยู่ใน W4c) — IP discard, ไม่เก็บ PII |
 | O5 | Search Console | owner verify property ด้วย DNS TXT ใน Cloudflare |
 
+### Decisions log
+
+- **O1 (2026-11-07):** `agency.bookchaowalit.com` — Vercel project `agency-main-web` (CLI deploy), Cloudflare CNAME
+  `agency` → `cname.vercel-dns.com` (DNS only), `NEXT_PUBLIC_SITE_URL` set for production; `NEXT_PUBLIC_SITE_INDEXABLE`
+  **ยังไม่ได้ตั้ง** → ทั้งเว็บยัง `noindex` / `Disallow: /` จนกว่า Wave 1 อนุมัติ
+
+### Wave 1 shortlist (รอ owner อนุมัติ)
+
+เลือกจาก agency ที่ status `incubating`/`target` (ไม่เอา `locked`) และหน้าที่เป็น hub ของ internal links:
+
+| Path | เหตุผล |
+|---|---|
+| `/services/ai-automation-workflow-sprint` | hub ของ 12 หน้า industries/solutions — ทุกหน้าลิงก์เข้า |
+| `/services/technical-recruitment-pilot` | Talent เป็น agency เดียวที่ `incubating` (มี validation จริง) |
+| `/services/security-readiness-assessment` | Cyber security — intent ชัด, buyer ตัดสินใจเร็ว |
+| `/services/ai-governance-readiness-review` | ตรง learning plan AI governance + demand ใหม่ |
+| `/solutions/manual-reporting/ai-automation-workflow-sprint` | ปัญหาที่ค้นหาบ่อยที่สุดของกลุ่ม solutions |
+| `/solutions/document-processing/ai-automation-workflow-sprint` | intent เชิงซื้อชัด, ลิงก์ถึงหลาย industry |
+
+ก่อนอนุมัติแต่ละหน้า: ผ่าน quality gate ข้อ 2 ด้านล่าง แล้วเพิ่ม path ใน `approvedPseoPaths`
+
 ## Phase 1 — Wave 1: เปิด 6 หน้าที่แข็งที่สุด (สัปดาห์ 1–2)
 
 1. เลือก 6 routes ที่มี evidence ครบและ intent ชัด (เริ่มจาก `/services/*` ของ agency ที่มี case/proof จริง)
