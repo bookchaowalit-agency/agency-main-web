@@ -21,7 +21,7 @@ action จะลามถึงทุกเว็บใน account เดีย�
 
 1. เลือก 6 routes ที่มี evidence ครบและ intent ชัด (เริ่มจาก `/services/*` ของ agency ที่มี case/proof จริง)
 2. Quality gate ต่อหน้า: เนื้อหาเฉพาะ ≥ 60% ไม่ซ้ำ template, มี evidence note, ≥ 3 internal links เข้า, ไม่มี claim ที่ห้ามอ้าง
-3. ตั้ง `NEXT_PUBLIC_SITE_URL` + `NEXT_PUBLIC_SITE_INDEXABLE=true`; หน้าที่ยังไม่ผ่าน wave ให้คง `noindex` รายหน้า — งาน dev ชิ้นแรก **ต้องเสร็จก่อนเปิด global flag**:
+3. ตั้ง `NEXT_PUBLIC_SITE_URL` + `NEXT_PUBLIC_SITE_INDEXABLE=true`; หน้าที่ยังไม่ผ่าน wave ให้คง `noindex` รายหน้า — **ทำแล้ว (2026-11-07):** `lib/pseo-indexing.ts` มี `approvedPseoPaths` (ว่างอยู่) ทุกหน้าใต้ `/services/*`, `/industries/*`, `/solutions/*` ที่ไม่อยู่ในรายการจะเป็น `noindex, follow` และไม่อยู่ใน sitemap แม้เปิด global flag; อนุมัติหน้าไหนให้เพิ่ม path ในรายการนั้น ขอบเขตเดิมที่ออกแบบไว้:
    - เพิ่ม flag `indexable` (default `false`) ต่อ record ทั้งใน `lib/pseo.ts` (industries/solutions) **และ** `lib/agency-pseo.ts` (`/services/*` ที่ Wave 1 ใช้)
    - consumers ที่ต้องเคารพ flag: `pageMetadata` ใน `app/services/[slug]/page.tsx` และ routes ใต้ `app/industries`, `app/solutions` (robots `noindex` รายหน้า) และ `app/sitemap.ts` (กรอง `agencyPseoServicePaths` + `pseoPilotPaths`)
    - test: global flag `true` แต่ record `indexable: false` → ต้องได้ `noindex` และไม่อยู่ใน sitemap

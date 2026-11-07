@@ -1,4 +1,5 @@
 import type { Metadata } from 'next';
+import { isPathIndexable } from '@/lib/pseo-indexing';
 
 const configuredUrl = process.env.NEXT_PUBLIC_SITE_URL?.trim();
 
@@ -44,8 +45,11 @@ export function pageMetadata(title: string, description: string, path: string): 
     openGraph: { type: 'website', title, description },
     twitter: { card: 'summary', title, description },
     ...(canonical ? { alternates: { canonical } } : {}),
-    robots: siteConfig.isIndexable
-      ? { index: true, follow: true }
-      : { index: false, follow: false },
+    // An unapproved pSEO page on an indexable site stays out of the index but still passes its internal links.
+    robots: !siteConfig.isIndexable
+      ? { index: false, follow: false }
+      : isPathIndexable(path)
+        ? { index: true, follow: true }
+        : { index: false, follow: true },
   };
 }
