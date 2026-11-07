@@ -11,6 +11,7 @@ import SolutionsPage from '@/app/solutions/page';
 import ProblemServicePage, { generateStaticParams as problemParams } from '@/app/solutions/[problem]/[service]/page';
 import NotFound from '@/app/not-found';
 import { agencies, statusCopy } from '@/lib/agency-portfolio';
+import { agencyPseoServices } from '@/lib/agency-pseo';
 
 const esc = (text: string) => text.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
 
@@ -55,5 +56,29 @@ describe('pSEO pilot directories', () => {
     await expect(IndustryServicePage({ params: Promise.resolve({ industry: 'nope', service: 'nope' }) })).rejects.toThrow(/NEXT_HTTP_ERROR_FALLBACK;404|NEXT_NOT_FOUND/);
     await expect(ProblemServicePage({ params: Promise.resolve({ problem: 'nope', service: 'nope' }) })).rejects.toThrow(/NEXT_HTTP_ERROR_FALLBACK;404|NEXT_NOT_FOUND/);
     expect(renderToString(<NotFound />)).toContain('href="/');
+  });
+});
+
+describe('Wave 1 internal links', () => {
+  const service = (agencySlug: string) => agencyPseoServices.find((item) => item.agencySlug === agencySlug)!;
+
+  it('every agency page links to its own pSEO service page', async () => {
+    for (const agency of agencies) {
+      const html = renderToString(await AgencyPage({ params: Promise.resolve({ slug: agency.slug }) }));
+      expect(html, agency.slug).toContain(`href="/services/${service(agency.slug).slug}"`);
+    }
+  });
+
+  it('related services link to each other so each Wave 1 service has 3+ inbound links', async () => {
+    const links: Record<string, string[]> = {
+      technology: ['governance-risk', 'cyber-security', 'talent'],
+      'governance-risk': ['cyber-security', 'technology'],
+      'cyber-security': ['governance-risk', 'technology'],
+      talent: ['technology'],
+    };
+    for (const [from, targets] of Object.entries(links)) {
+      const html = renderToString(await ServicePage({ params: Promise.resolve({ slug: service(from).slug }) }));
+      for (const to of targets) expect(html, `${from} -> ${to}`).toContain(`href="/services/${service(to).slug}"`);
+    }
   });
 });

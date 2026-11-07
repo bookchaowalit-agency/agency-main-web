@@ -205,3 +205,22 @@ export function getAgencyPseoService(slug: string) {
 }
 
 export const agencyPseoServicePaths = agencyPseoServices.map((service) => `/services/${service.slug}`);
+
+export function getAgencyPseoServiceForAgency(agencySlug: string) {
+  return agencyPseoServices.find((service) => service.agencySlug === agencySlug);
+}
+
+// Services a buyer of one offer typically needs next (AI automation needs governance and security review, and
+// technical hiring feeds the automation sprint). Only real adjacencies: these links are for readers, not link counts.
+const relatedServiceAgencies: Partial<Record<string, string[]>> = {
+  technology: ['governance-risk', 'cyber-security', 'talent'],
+  'governance-risk': ['cyber-security', 'technology'],
+  'cyber-security': ['governance-risk', 'technology'],
+  talent: ['technology'],
+};
+
+export function getRelatedAgencyPseoServices(agencySlug: string) {
+  return (relatedServiceAgencies[agencySlug] ?? [])
+    .map((slug) => getAgencyPseoServiceForAgency(slug))
+    .filter((service): service is AgencyPseoService => Boolean(service));
+}

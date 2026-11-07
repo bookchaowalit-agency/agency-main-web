@@ -1,6 +1,6 @@
 import { notFound } from 'next/navigation';
 import { PseoLandingPage } from '@/components/pseo-landing-page';
-import { agencyPseoServices, getAgencyPseoService } from '@/lib/agency-pseo';
+import { agencyPseoServices, getAgencyPseoService, getRelatedAgencyPseoServices } from '@/lib/agency-pseo';
 import { pageMetadata } from '@/lib/site-config';
 
 export function generateStaticParams() {
@@ -20,7 +20,7 @@ export default async function ServicePage({ params }: { params: Promise<{ slug: 
   const service = getAgencyPseoService(slug);
   if (!service) notFound();
 
-  const relatedLinks = service.agencySlug === 'technology'
+  const baseLinks = service.agencySlug === 'technology'
     ? [
         { href: '/industries', label: 'ดูตามอุตสาหกรรม' },
         { href: '/solutions', label: 'ดูตามปัญหา' },
@@ -29,6 +29,11 @@ export default async function ServicePage({ params }: { params: Promise<{ slug: 
         { href: `/agencies/${service.agencySlug}`, label: `ดู ${service.name}` },
         { href: '/services', label: 'ดู service ทั้งหมด' },
       ];
+
+  const relatedLinks = [
+    ...baseLinks,
+    ...getRelatedAgencyPseoServices(service.agencySlug).map((related) => ({ href: `/services/${related.slug}`, label: related.name })),
+  ];
 
   return <PseoLandingPage eyebrow={`SERVICE / ${service.name.toUpperCase()}`} title={service.title} intent={service.intent} buyer={service.buyer} context={service.context} workflow={service.workflow} deliverables={service.deliverables} evidence={service.evidence} readiness={service.readiness} agencySlug={service.agencySlug} canonicalPath={`/services/${service.slug}`} relatedLinks={relatedLinks} />;
 }

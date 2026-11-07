@@ -6,7 +6,13 @@
 // without an import cycle (the pSEO data modules import site-config through agency-portfolio).
 
 export const approvedPseoPaths: ReadonlySet<string> = new Set<string>([
-  // Wave 1 paths go here once approved, e.g. '/services/<service-slug>'.
+  // Wave 1 — owner-approved 2026-11-07 (docs/pseo-indexing-and-links-plan.md).
+  '/services/ai-automation-workflow-sprint',
+  '/services/technical-recruitment-pilot',
+  '/services/security-readiness-assessment',
+  '/services/ai-governance-readiness-review',
+  '/solutions/manual-reporting/ai-automation-workflow-sprint',
+  '/solutions/document-processing/ai-automation-workflow-sprint',
 ]);
 
 // Landing pages live one level or more below these directory roots; the roots themselves are directories.

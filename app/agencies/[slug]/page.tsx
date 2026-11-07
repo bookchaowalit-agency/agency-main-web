@@ -1,6 +1,7 @@
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { agencies, getAgency, statusCopy } from '@/lib/agency-portfolio';
+import { getAgencyPseoServiceForAgency } from '@/lib/agency-pseo';
 import { pageMetadata } from '@/lib/site-config';
 
 const formatAgencyNumber = (number: number) => String(number).padStart(2, '0');
@@ -23,6 +24,7 @@ export default async function AgencyPage({ params }: { params: Promise<{ slug: s
   if (!agency) notFound();
 
   const readiness = statusCopy[agency.status];
+  const service = getAgencyPseoServiceForAgency(agency.slug);
 
   return (
     <main id="main-content" className="public-page agency-page detail-page">
@@ -40,7 +42,7 @@ export default async function AgencyPage({ params }: { params: Promise<{ slug: s
 
       <section id="engagement" className="fit-grid" aria-label={`${agency.name} buyer and engagement`}>
         <article className="fit-card fit-problem"><p className="eyebrow">THE PROBLEM</p><h2>{agency.problem}</h2><p>{agency.fit}</p></article>
-        <article className="fit-card fit-offer"><p className="eyebrow">STARTING ENGAGEMENT</p><h2>{agency.offer}</h2><p>{agency.offerDetail}</p><a className="text-link" href="#scope">ดูขอบเขตงาน <span aria-hidden="true">→</span></a></article>
+        <article className="fit-card fit-offer"><p className="eyebrow">STARTING ENGAGEMENT</p><h2>{agency.offer}</h2><p>{agency.offerDetail}</p><a className="text-link" href="#scope">ดูขอบเขตงาน <span aria-hidden="true">→</span></a>{service ? <> <Link className="text-link" href={`/services/${service.slug}`}>ดูหน้า service <span aria-hidden="true">↗</span></Link></> : null}</article>
       </section>
 
       <section id="scope" className="detail-grid" aria-label={`${agency.name} scope and readiness`}>
