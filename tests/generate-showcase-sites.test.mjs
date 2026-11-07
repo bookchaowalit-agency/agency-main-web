@@ -55,6 +55,7 @@ function checkSiteTemplate(site) {
   const base = JSON.parse(readFileSync(join(sourceRoot, 'package.json'), 'utf8'));
   assert.deepEqual(pkg.dependencies, base.dependencies, 'site dependencies must match the copied lockfile');
   assert.deepEqual(pkg.devDependencies, base.devDependencies, 'site devDependencies must match the copied lockfile');
+  assert.deepEqual(pkg.overrides, base.overrides, 'site overrides must match the copied lockfile');
   assert.equal(pkg.dependencies.next, '16.4.2');
   assert.ok(!('eslint-config-next' in pkg.dependencies), 'eslint-config-next is a devDependency');
   for (const script of ['lint', 'typecheck', 'test', 'check']) assert.ok(pkg.scripts[script], `missing ${script} script`);
@@ -65,6 +66,27 @@ function checkSiteTemplate(site) {
   assert.ok(existsSync(join(site, 'instrumentation-client.ts')), 'browser Sentry init');
   assert.ok(!existsSync(join(site, 'instrumentation.ts')), 'static export: no server Sentry runtime');
   assert.match(readFileSync(join(site, '.gitignore'), 'utf8'), /\*\.tsbuildinfo/);
+}
+
+// The parent's reviewed OSV exceptions cover the packages the copied lockfile brings in.
+function checkOsvExceptions(site) {
+  const ignores = (file) => [...readFileSync(file, 'utf8').matchAll(/^id = "([^"]+)"\nignoreUntil = (\S+)$/gm)].map(([, id, until]) => `${id} until ${until}`);
+  const parent = ignores(join(sourceRoot, 'osv-scanner.toml'));
+  assert.ok(parent.length > 0, 'parent osv-scanner.toml has no exceptions to compare');
+  const own = ignores(join(site, 'osv-scanner.toml'));
+  for (const entry of parent) assert.ok(own.includes(entry), `generated osv-scanner.toml is missing ${entry}`);
+}
+
+// `npm ci` in a clean generated site (as its CI runs it) must accept the copied lockfile.
+// The toolchain check below symlinks node_modules, so it cannot see a package.json/lock mismatch.
+function checkCleanInstall(site, fixture) {
+  const env = { PATH: process.env.PATH, HOME: fixture, npm_config_cache: join(fixture, '.npm'), npm_config_update_notifier: 'false' };
+  for (const args of [['ci', '--dry-run', '--ignore-scripts', '--no-audit', '--no-fund'], ['ls', '--package-lock-only', '--all']]) {
+    const result = spawnSync('npm', args, { cwd: site, env, encoding: 'utf8' });
+    if (result.error) throw result.error;
+    assert.equal(result.status, 0, `npm ${args.join(' ')} failed in the generated site:\n${result.stdout}${result.stderr}`);
+  }
+  assert.ok(!existsSync(join(site, 'node_modules')), 'dry run must not install');
 }
 
 // One generated site must pass its own lint, typecheck and tests with the shared node_modules.
@@ -112,6 +134,8 @@ test('showcase tools package local fonts and preserve existing targets', () => {
     assert.equal(sites.length, 14);
     for (const name of sites) checkFonts(join(fixture, name));
     for (const name of sites) checkSiteTemplate(join(fixture, name));
+    checkOsvExceptions(join(fixture, 'agency-legal-web'));
+    checkCleanInstall(join(fixture, 'agency-legal-web'), fixture);
     checkSiteToolchain(join(fixture, 'agency-legal-web'), run);
 
     const before = Object.fromEntries(sites.map((name) => [name, snapshot(join(fixture, name))]));

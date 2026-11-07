@@ -368,7 +368,7 @@ function readAgencies() {
 }
 
 function packageJson(name) {
-  // Same dependencies as this repository, so the lockfile copied below matches and `npm ci` works.
+  // Same dependencies and overrides as this repository, so the lockfile copied below matches and `npm ci` works.
   const base = JSON.parse(readFileSync(join(baseRepo, 'package.json'), 'utf8'));
   return {
     name,
@@ -378,6 +378,7 @@ function packageJson(name) {
     scripts: { dev: 'next dev -p 3010', build: 'next build', start: 'next start -p 3010', lint: 'eslint', typecheck: 'tsc --noEmit', test: 'vitest run', check: 'npm run typecheck && npm run build' },
     dependencies: base.dependencies,
     devDependencies: base.devDependencies,
+    ...(base.overrides ? { overrides: base.overrides } : {}),
   };
 }
 
