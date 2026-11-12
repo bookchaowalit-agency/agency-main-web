@@ -2,6 +2,7 @@ import Link from 'next/link';
 import { PublicHeader } from '@/components/public-header';
 import { pseoProblems, pseoService } from '@/lib/pseo';
 import { pageMetadata } from '@/lib/site-config';
+import SiteLinks from '@/components/site-links';
 
 export const metadata = pageMetadata('Problems — pSEO Pilot', 'ปัญหา workflow ที่กำลังทดสอบด้วย AI Automation แบบมี human review', '/solutions');
 
@@ -15,7 +16,7 @@ export default function SolutionsPage() {
           <aside className="hero-aside"><p className="eyebrow">SERVICE</p><strong>{pseoService.name}</strong><p>เลือกปัญหาที่มี owner, baseline และ acceptance criteria ได้</p></aside>
         </section>
         <section className="pseo-directory-section" aria-labelledby="problem-list-title"><div className="section-heading"><div><p className="eyebrow">6 PILOT PROBLEMS</p><h2 id="problem-list-title">เลือกปัญหา</h2></div><p>แต่ละหน้าให้ workflow, deliverable และขอบเขตหลักฐานที่แตกต่างกัน</p></div><div className="pseo-directory-grid">{pseoProblems.map((item) => <Link className="pseo-directory-card" key={item.slug} href={`/solutions/${item.slug}/${item.serviceSlug}`}><div><span className="eyebrow">{item.name}</span><h3>{item.title}</h3><p>{item.intent}</p></div><span aria-hidden="true">↗</span></Link>)}</div></section>
-        <footer className="site-footer"><span>Solo Empire Group · problem directory</span><span>pilot / no inquiry intake</span></footer>
+        <footer className="site-footer"><span>Solo Empire Group · problem directory</span><span>pilot / no inquiry intake</span><SiteLinks /></footer>
       </main>
     </div>
   );

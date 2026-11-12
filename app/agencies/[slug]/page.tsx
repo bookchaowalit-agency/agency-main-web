@@ -3,6 +3,7 @@ import { notFound } from 'next/navigation';
 import { agencies, getAgency, statusCopy } from '@/lib/agency-portfolio';
 import { getAgencyPseoServiceForAgency } from '@/lib/agency-pseo';
 import { pageMetadata } from '@/lib/site-config';
+import SiteLinks from '@/components/site-links';
 
 const formatAgencyNumber = (number: number) => String(number).padStart(2, '0');
 
@@ -52,7 +53,7 @@ export default async function AgencyPage({ params }: { params: Promise<{ slug: s
 
       <section className="ownership-row" aria-label={`${agency.name} future ownership path`}><div><p className="eyebrow">OWNERSHIP PATH</p><h2>สิ่งที่ต้องสะสม</h2></div><p>{agency.asset}</p></section>
 
-      <footer className="site-footer"><span>Solo Empire Group · {agency.name}</span><span><Link href="/agencies">ทุกแบรนด์</Link><i>·</i><a href="#engagement">เริ่มดู engagement</a></span></footer>
+      <footer className="site-footer"><span>Solo Empire Group · {agency.name}</span><span><Link href="/agencies">ทุกแบรนด์</Link><i>·</i><a href="#engagement">เริ่มดู engagement</a></span><SiteLinks /></footer>
     </main>
   );
 }

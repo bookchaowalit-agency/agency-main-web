@@ -2,6 +2,7 @@ import Link from 'next/link';
 import { getAgency, statusCopy } from '@/lib/agency-portfolio';
 import { PublicHeader } from '@/components/public-header';
 import { absoluteUrl, siteConfig } from '@/lib/site-config';
+import SiteLinks from '@/components/site-links';
 
 export type PseoLandingPageProps = {
   eyebrow: string;
@@ -112,7 +113,7 @@ export function PseoLandingPage({
           <div className="pseo-related-grid">{relatedLinks.map((link) => <Link className="pseo-related-link" key={link.href} href={link.href}>{link.label}<span aria-hidden="true">↗</span></Link>)}</div>
         </section>
 
-        <footer className="site-footer"><span>Solo Empire Group · pSEO pilot</span><span>{agency?.name ?? 'Technology'} · {agencyReadiness?.label ?? 'validation'}</span></footer>
+        <footer className="site-footer"><span>Solo Empire Group · pSEO pilot</span><span>{agency?.name ?? 'Technology'} · {agencyReadiness?.label ?? 'validation'}</span><SiteLinks /></footer>
       </main>
     </div>
   );

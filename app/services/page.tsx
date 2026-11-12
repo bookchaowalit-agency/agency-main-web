@@ -3,6 +3,7 @@ import { PublicHeader } from '@/components/public-header';
 import { agencyPseoServices } from '@/lib/agency-pseo';
 import { getAgency, statusCopy } from '@/lib/agency-portfolio';
 import { pageMetadata } from '@/lib/site-config';
+import SiteLinks from '@/components/site-links';
 
 export const metadata = pageMetadata('Services — pSEO Pilot', 'บริการและ workflow ที่กำลังทดสอบด้วยหน้า pSEO แบบ public-safe', '/services');
 
@@ -30,7 +31,7 @@ export default function ServicesPage() {
           <div className="pseo-directory-links"><Link href="/industries">ดูตามอุตสาหกรรม <span aria-hidden="true">→</span></Link><Link href="/solutions">ดูตามปัญหา <span aria-hidden="true">→</span></Link></div>
         </section>
 
-        <footer className="site-footer"><span>Solo Empire Group · service directory</span><span>pilot / no inquiry intake</span></footer>
+        <footer className="site-footer"><span>Solo Empire Group · service directory</span><span>pilot / no inquiry intake</span><SiteLinks /></footer>
       </main>
     </div>
   );

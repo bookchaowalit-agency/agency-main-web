@@ -1,4 +1,5 @@
 import Link from 'next/link';
+import SiteLinks from '@/components/site-links';
 
 export default function HomePage() {
   return (
@@ -14,6 +15,7 @@ export default function HomePage() {
         <Link href="/solutions">Problems <span aria-hidden="true">↗</span></Link>
       </div>
       <p className="home-note">หน้านี้เป็น portfolio preview สถานะของแต่ละ vertical จะแสดงตามความพร้อมจริง และยังไม่มี lead form หรือการรับข้อมูลลูกค้า</p>
+      <SiteLinks />
     </main>
   );
 }
