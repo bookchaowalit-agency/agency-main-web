@@ -24,7 +24,7 @@ The owner: a content baseline and the scaffold for new agency sites. It is not a
 2. Noindex by default (`noindex, nofollow`, `Disallow: /`, empty sitemap). Indexing needs an approved
    `NEXT_PUBLIC_SITE_URL` (http(s), no query, fragment or credentials) and `NEXT_PUBLIC_SITE_INDEXABLE=true`.
 3. The generator creates a new `agency-<slug>-web` sibling with CI, ESLint, Vitest tests, browser-only Sentry and
-   Next.js 16.4.2, and refuses to overwrite an existing directory.
+   Next.js 16.4.5, and refuses to overwrite an existing directory.
 4. Browser-only Sentry is wired (errors only, PII stripped) but inert: there is no DSN because there is no deploy.
 
 ## What does not work (and must not be claimed)
