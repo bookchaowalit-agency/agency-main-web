@@ -305,7 +305,7 @@ function backfillProductionUrl(sitePath, slug) {
   writeText(sitePath, updated);
 }
 
-// Tests written for the extensionless app/opengraph-image module and the localhost metadata URL: replace or update
+// Tests written for the extensionless app/opengraph-image module or the app/og.png route, and the localhost metadata URL: replace or update
 // them along with the route, so a migrated site still typechecks and passes Vitest.
 const legacyTestFixes = [
   ["expect(siteConfig.metadataUrl).toBe('http://localhost:3010');", "expect(siteConfig.metadataUrl).toBe(siteConfig.productionUrl);"],
@@ -322,7 +322,8 @@ function migrateLegacyTests(target) {
     if (!/\.test\.tsx?$/.test(name)) continue;
     const path = join(testsDir, name);
     const source = readFileSync(path, 'utf8');
-    if (source.includes('@/app/opengraph-image')) {
+    // Both older social-card modules: the extensionless opengraph-image and the app/og.png route handler.
+    if (source.includes('@/app/opengraph-image') || source.includes('@/app/og.png/route')) {
       writeText(path, templateFile('tests/opengraph.test.tsx'));
       continue;
     }

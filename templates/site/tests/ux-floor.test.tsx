@@ -1,3 +1,5 @@
+import { readFileSync } from 'node:fs';
+import { join } from 'node:path';
 import { renderToString } from 'react-dom/server';
 import { describe, expect, it } from 'vitest';
 import Home from '@/app/page';
@@ -43,5 +45,19 @@ describe('UX floor', () => {
   it('marks English runs in Thai copy with lang="en"', () => {
     expect(renderToString(<LangText text="ลดความเสี่ยงของ cyber-physical systems ด้วยหลักฐาน" />)).toContain('<span lang="en">cyber-physical systems</span>');
     expect(renderToString(<LangText text="ภาษาไทยล้วน" />)).toBe('ภาษาไทยล้วน');
+  });
+
+  it('draws the focus ring at 3:1 or more on the page background', () => {
+    const read = (file: string) => readFileSync(join(process.cwd(), 'app', file), 'utf8');
+    const root = read('globals.css').match(/:root\s*\{([^}]*)\}/)![1];
+    const token = (name: string) => root.match(new RegExp(`--${name}:\\s*(#[0-9a-fA-F]{6})`))?.[1];
+    const fallback = read('ux-floor.css').match(/:focus-visible, a:focus-visible \{[^}]*var\(--focus, var\(--([a-z-]+)\)\)/)![1];
+    const ring = token('focus') ?? token(fallback)!;
+    const luminance = (hex: string) => {
+      const [r, g, b] = [1, 3, 5].map((i) => parseInt(hex.slice(i, i + 2), 16) / 255).map((c) => (c <= 0.04045 ? c / 12.92 : ((c + 0.055) / 1.055) ** 2.4));
+      return 0.2126 * r + 0.7152 * g + 0.0722 * b;
+    };
+    const [hi, lo] = [luminance(ring), luminance(token('bg')!)].sort((x, y) => y - x);
+    expect((hi + 0.05) / (lo + 0.05)).toBeGreaterThanOrEqual(3);
   });
 });

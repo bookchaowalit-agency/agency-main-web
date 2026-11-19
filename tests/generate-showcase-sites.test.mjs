@@ -167,6 +167,20 @@ test('showcase tools package local fonts and preserve existing targets', () => {
     assert.match(readFileSync(join(cyber, 'app', 'robots.ts'), 'utf8'), /Twitterbot/);
     // Cyber's promise mixes Thai and English, so LangText splits it: its tests and build must still pass.
     checkSiteToolchain(cyber, run);
+
+    // A site from the app/og.png route era (templates/site before 1b97347): the route handler and a test that
+    // imports it. Migration removes the route, writes public/og.png and replaces that test, so tsc and Vitest pass.
+    const talent = join(fixture, 'agency-talent-web');
+    rmSync(join(talent, 'public', 'og.png'));
+    mkdirSync(join(talent, 'app', 'og.png'), { recursive: true });
+    cpSync(join(legacy, 'og-route.tsx.txt'), join(talent, 'app', 'og.png', 'route.tsx'));
+    cpSync(join(legacy, 'og-route.test.tsx.txt'), join(talent, 'tests', 'opengraph.test.tsx'));
+    const routeEra = run(['--input-type=module', '--eval', "const { migrateSites } = await import('./scripts/migrate-showcase-pseo.mjs'); await migrateSites({ onlySlugs: ['talent'] });"]);
+    assert.equal(routeEra.status, 0, routeEra.stdout + routeEra.stderr);
+    assert.ok(!existsSync(join(talent, 'app', 'og.png')), 'migration removes the app/og.png route handler');
+    assert.ok(existsSync(join(talent, 'public', 'og.png')), 'migration writes the static public/og.png');
+    assert.doesNotMatch(readFileSync(join(talent, 'tests', 'opengraph.test.tsx'), 'utf8'), /@\/app\/og\.png\/route/);
+    checkSiteToolchain(talent, run);
   } finally {
     rmSync(fixture, { recursive: true, force: true });
   }
