@@ -23,11 +23,11 @@ describe('portfolio pages', () => {
     expect(html).not.toMatch(/<form/);
   });
 
-  it('home shows three real verticals, the shared footer and a link back to the hub', () => {
+  it('home shows three real verticals and the shared footer, without a sitewide link to bookchaowalit.com', () => {
     const html = renderToString(<HomePage />);
     for (const slug of ['talent', 'cyber-security', 'governance-risk']) expect(html).toContain(`href="/agencies/${slug}"`);
     expect(html).toContain('class="site-footer"');
-    expect(html).toContain('href="https://bookchaowalit.com"');
+    expect(html).not.toContain('href="https://bookchaowalit.com"');
     expect(html).toMatch(/<h1 lang="en"/);
     // The header brand returns to the home page from every page.
     expect(html).toMatch(/class="site-brand" href="\/"/);
@@ -89,6 +89,32 @@ describe('Wave 1 internal links', () => {
     for (const [from, targets] of Object.entries(links)) {
       const html = renderToString(await ServicePage({ params: Promise.resolve({ slug: service(from).slug }) }));
       for (const to of targets) expect(html, `${from} -> ${to}`).toContain(`href="/services/${service(to).slug}"`);
+    }
+  });
+});
+
+describe('pSEO link plan (Phase 3a): one portfolio <-> hub link, on the services page only', () => {
+  const hub = /href="https:\/\/bookchaowalit\.com\/?"/g;
+  it('the services page links bookchaowalit.com once, in its content, not in the footer', () => {
+    const html = renderToString(<ServicesPage />);
+    expect(html.match(hub)).toHaveLength(1);
+    expect(html.slice(html.lastIndexOf('<footer'))).not.toMatch(hub);
+  });
+
+  it('no other page links bookchaowalit.com; every footer keeps Privacy and Status', async () => {
+    const service = agencyPseoServices[0];
+    const pages = [
+      renderToString(<HomePage />),
+      renderToString(<AgenciesPage />),
+      renderToString(await AgencyPage({ params: Promise.resolve({ slug: agencies[0].slug }) })),
+      renderToString(await ServicePage({ params: Promise.resolve({ slug: service.slug }) })),
+      renderToString(<IndustriesPage />),
+      renderToString(<SolutionsPage />),
+    ];
+    for (const html of pages) {
+      expect(html).not.toMatch(hub);
+      expect(html).toContain('href="https://bookchaowalit.com/privacy"');
+      expect(html).toContain('href="https://monitor.bookchaowalit.com/"');
     }
   });
 });

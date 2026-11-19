@@ -18,7 +18,7 @@ export default function ServicesPage() {
             <h1 id="services-title">เริ่มจาก service<br /><em>ที่วัดผลได้</em></h1>
             <p className="lede">หน้าเหล่านี้เป็น pilot สำหรับทดสอบ search intent และการอธิบายข้อเสนอ ไม่ใช่การยืนยันว่าเปิดรับงานแล้ว</p>
           </div>
-          <aside className="hero-aside"><p className="eyebrow">PILOT SCOPE</p><strong>14 services · 6 industries · 6 problems</strong><p>ทุกหน้ามี owner, workflow, deliverables และ evidence boundary ของตัวเอง</p></aside>
+          <aside className="hero-aside"><p className="eyebrow">PILOT SCOPE</p><strong>14 services · 6 industries · 6 problems</strong><p>ทุกหน้ามี owner, workflow, deliverables และ evidence boundary ของตัวเอง</p>{/* The hub's one link to the portfolio site (pSEO plan, Phase 3a): here, not in a sitewide footer. */}<p>ดูผลงานและวิธีทำงานของผู้สร้างที่ <a href="https://bookchaowalit.com">bookchaowalit.com</a></p></aside>
         </section>
 
         <section className="pseo-directory-section" aria-labelledby="service-list-title">
