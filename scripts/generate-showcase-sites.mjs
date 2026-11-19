@@ -4,6 +4,7 @@ import { dirname, join } from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 import { tmpdir } from 'node:os';
 import { productionUrls } from './showcase-domains.mjs';
+import { writeOgPng } from './og-png.mjs';
 
 const require = createRequire(import.meta.url);
 const typescript = require('typescript');
@@ -468,6 +469,7 @@ for (const agency of agencies) {
   writeText(join(target, 'README.md'), readme(site));
   writeText(join(target, 'AGENTS.md'), agentsFile(site));
   writeText(join(target, 'lib', 'site.ts'), `export const site = ${artifactData(site)} as const;\n`);
+  await writeOgPng(target);
   writeText(join(target, 'app', 'layout.tsx'), layoutTemplate());
   writeText(join(target, 'app', 'globals.css'), cssTemplate(site));
   writeText(join(target, 'app', 'not-found.tsx'), `export default function NotFound() {\n  return <main id="main-content" className="site-main"><section className="story-section"><h1>ไม่พบหน้านี้</h1><p>กลับไปที่หน้า showcase หลักเพื่อดูขอบเขตของ vertical นี้</p></section></main>;\n}\n`);

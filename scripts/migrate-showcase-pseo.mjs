@@ -13,6 +13,7 @@ import { dirname, join } from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 import { tmpdir } from 'node:os';
 import { productionUrls } from './showcase-domains.mjs';
+import { writeOgPng } from './og-png.mjs';
 
 const require = createRequire(import.meta.url);
 const typescript = require('typescript');
@@ -394,11 +395,15 @@ export async function migrateSites({ onlySlugs } = {}) {
     writeText(join(target, 'components', 'pseo-page.tsx'), componentTemplate());
     // The layout, home and service pages written here import these: copy them so a site built from an older
     // base still compiles after the migration.
-    for (const file of ['app/ux-floor.css', 'app/design-floor/tokens.css', 'components/site-links.tsx', 'components/lang-text.tsx', 'app/og.png/route.tsx']) {
+    for (const file of ['app/ux-floor.css', 'app/design-floor/tokens.css', 'components/site-links.tsx', 'components/lang-text.tsx', 'lib/og-card.ts', 'scripts/og.mjs']) {
       writeText(join(target, file), templateFile(file));
     }
-    // The social card moved to app/og.png/route.tsx (a real .png in the export); two image sources would both emit og:image.
+    // The social card is a committed public/og.png (a real .png in the export, no route handler: AGENTS.md
+    // allows no API routes). Older sites had app/opengraph-image.tsx or app/og.png/route.tsx; two image
+    // sources would both emit og:image.
     rmSync(join(target, 'app', 'opengraph-image.tsx'), { force: true });
+    rmSync(join(target, 'app', 'og.png'), { recursive: true, force: true });
+    await writeOgPng(target);
     migrateLegacyTests(target);
     writeText(join(target, 'app', 'layout.tsx'), layoutTemplate());
     writeText(join(target, 'app', 'services', 'page.tsx'), indexPageTemplate());

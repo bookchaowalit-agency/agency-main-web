@@ -147,7 +147,7 @@ test('showcase tools package local fonts and preserve existing targets', () => {
     const cyber = join(fixture, 'agency-cyber-security-web');
     rmSync(join(cyber, 'app', 'fonts'), { recursive: true });
     // Simulate a site from the older base, before the shared UX floor: the migration must bring these back.
-    const floorFiles = ['app/ux-floor.css', 'app/design-floor/tokens.css', 'components/site-links.tsx', 'components/lang-text.tsx', 'app/og.png/route.tsx'];
+    const floorFiles = ['app/ux-floor.css', 'app/design-floor/tokens.css', 'components/site-links.tsx', 'components/lang-text.tsx', 'lib/og-card.ts', 'scripts/og.mjs', 'public/og.png'];
     for (const file of floorFiles) rmSync(join(cyber, file));
     // Files as a site from the base before og.png had them (templates/site at 3e72174): the extensionless
     // opengraph-image module, tests that import it or expect localhost and a closed robots.txt, and no productionUrl.
