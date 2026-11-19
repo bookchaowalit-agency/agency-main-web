@@ -186,6 +186,8 @@ a { color: inherit; }
 .site-links a { display: inline-flex; align-items: center; min-height: 44px; color: inherit; text-decoration: none; }
 .site-links a:hover { color: var(--ink); text-decoration: underline; text-underline-offset: 4px; }
 .public-home .site-footer { width: 100%; margin-top: 48px; text-align: left; }
+.public-home > .site-links { justify-content: center; margin-top: 8px; color: var(--muted); }
+.public-home .home-note { margin-top: 24px; }
 
 @media (max-width: 900px) {
   .agency-grid, .core-grid, .pseo-related-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
@@ -193,8 +195,9 @@ a { color: inherit; }
   /* Keep every link on small screens: the nav becomes a scrollable row under the brand. */
   .site-header { position: static; flex-wrap: wrap; gap: 0; padding-top: 4px; padding-bottom: 4px; }
   /* The hidden scrollbar gives no hint that more links sit off-screen, so fade the right edge. */
-  .site-header nav { width: calc(100% + 20px); margin: 0 -10px; flex-wrap: nowrap; overflow-x: auto; scrollbar-width: none; -webkit-mask-image: linear-gradient(90deg, #000 85%, transparent); mask-image: linear-gradient(90deg, #000 85%, transparent); }
-  .site-header nav::after { flex: 0 0 32px; content: ''; }
+  .site-header nav { width: calc(100% + 20px); margin: 0 -10px; flex-wrap: nowrap; overflow-x: auto; scrollbar-width: none; -webkit-mask-image: linear-gradient(90deg, #000 calc(100% - 40px), transparent); mask-image: linear-gradient(90deg, #000 calc(100% - 40px), transparent); }
+  /* Spacer wider than the fade, so the last link is fully opaque once scrolled to the end. */
+  .site-header nav::after { flex: 0 0 48px; content: ''; }
   .home-featured { grid-template-columns: 1fr; }
   .site-header nav a { white-space: nowrap; }
 }

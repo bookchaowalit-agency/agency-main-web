@@ -1,6 +1,7 @@
 import Link from 'next/link';
 import { PublicHeader } from '@/components/public-header';
 import { SiteFooter } from '@/components/site-footer';
+import SiteLinks from '@/components/site-links';
 import { agencies } from '@/lib/agency-portfolio';
 
 // Three real verticals on the first screen, so a buyer sees the work before clicking through.
@@ -23,6 +24,8 @@ export default function HomePage() {
           <Link href="/industries">Industries <span aria-hidden="true">›</span></Link>
           <Link href="/solutions">Problems <span aria-hidden="true">›</span></Link>
         </div>
+        <p className="home-note">หน้านี้เป็น portfolio preview สถานะของแต่ละ vertical จะแสดงตามความพร้อมจริง และยังไม่มี lead form หรือการรับข้อมูลลูกค้า</p>
+        <SiteLinks />
         <section className="home-featured" aria-label="ตัวอย่างกลุ่มงาน">
           {featured.map((agency) => (
             <Link className="agency-card" href={`/agencies/${agency.slug}`} key={agency.slug}>
@@ -32,8 +35,7 @@ export default function HomePage() {
             </Link>
           ))}
         </section>
-        <p className="home-note">หน้านี้เป็น portfolio preview สถานะของแต่ละ vertical จะแสดงตามความพร้อมจริง และยังไม่มี lead form หรือการรับข้อมูลลูกค้า</p>
-        <SiteFooter label="portfolio preview" />
+        <SiteFooter label="portfolio preview" links={false} />
       </main>
     </div>
   );
