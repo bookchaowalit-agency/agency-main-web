@@ -181,7 +181,6 @@ html { scroll-behavior: smooth; }
 body { margin: 0; color: var(--ink); background: var(--bg); font-family: var(--sans); }
 ::selection { color: var(--inverse-ink); background: var(--accent); }
 a { color: inherit; }
-a:focus-visible { outline: 2px solid var(--accent); outline-offset: 5px; }
 .skip-link { position: fixed; z-index: 10; top: 8px; left: 8px; padding: 9px 12px; color: var(--inverse-ink); background: var(--inverse); transform: translateY(-160%); }
 .skip-link:focus { transform: translateY(0); }
 .site-shell { min-height: 100vh; overflow: hidden; background: var(--bg); }
@@ -321,7 +320,9 @@ function layoutTemplate() {
 import localFont from 'next/font/local';
 import type { ReactNode } from 'react';
 import { site } from '@/lib/site';
+import './design-floor/tokens.css';
 import './globals.css';
+import './ux-floor.css';
 
 const notoSansThai = localFont({
   src: [
