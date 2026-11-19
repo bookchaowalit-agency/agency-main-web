@@ -63,6 +63,8 @@ html { scroll-padding-top: 24px; }
 .locked-note a { display: inline-flex; align-items: center; gap: 4px; min-height: var(--target-touch, 44px); color: var(--ink); font-weight: 600; text-underline-offset: 4px; }
 .hero-meta { margin-top: 20px; }
 .readiness-link { margin-top: 16px; color: inherit; font-size: 15px; font-weight: 600; text-underline-offset: 4px; }
+/* .readiness-note span styles the status line; the link's arrow span must stay inline. */
+.readiness-note .readiness-link span { display: inline; margin: 0; padding: 0; border: 0; color: inherit; font-family: inherit; font-size: inherit; }
 
 /* Footer: hub, portfolio, privacy, status and contact links. */
 .site-footer, .pseo-footer { flex-wrap: wrap; align-items: center; }
@@ -82,11 +84,11 @@ html { scroll-padding-top: 24px; }
 .editorial-rows li + li { margin-top: 6px; }
 .artifact-editorial strong { font-size: clamp(32px, 3.6vw, 48px); letter-spacing: -.01em; line-height: 1.1; }
 .blueprint-label { position: absolute; color: var(--ink); font-size: 13px; font-weight: 600; }
-.label-a { top: calc(29% + 24px); left: calc(24% - 8px); }.label-b { top: calc(43% + 24px); right: calc(19% - 8px); }.label-c { bottom: calc(21% - 24px); left: calc(47% + 26px); }
+.label-a { top: calc(29% + 24px); left: calc(24% - 8px); }.label-b { top: calc(43% + 24px); right: calc(19% - 8px); }.label-c { bottom: 21%; left: calc(47% + 26px); }
 .dealroom-bars { gap: 16px; }
 .dealroom-bars i { position: relative; }
-.dealroom-bars i:nth-child(1) { height: 84%; }.dealroom-bars i:nth-child(2) { height: 52%; opacity: .7; }.dealroom-bars i:nth-child(3) { height: 26%; opacity: .45; }
-.dealroom-bars b { position: absolute; top: -22px; left: 0; color: var(--ink); font-size: 12px; font-weight: 600; white-space: nowrap; }
+.dealroom-bars i:nth-child(1) { height: 84%; }.dealroom-bars i:nth-child(2) { height: 52%; background: color-mix(in srgb, var(--accent) 70%, var(--bg)); }.dealroom-bars i:nth-child(3) { height: 26%; background: color-mix(in srgb, var(--accent) 45%, var(--bg)); }
+.dealroom-bars b { position: absolute; top: -22px; left: 0; color: var(--ink); font-size: 12px; font-style: normal; font-weight: 600; white-space: nowrap; }
 .artifact-chambers em { margin-top: 8px; }
 
 @media (max-width: 650px) {
