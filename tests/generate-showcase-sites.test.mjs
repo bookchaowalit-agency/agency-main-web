@@ -146,9 +146,15 @@ test('showcase tools package local fonts and preserve existing targets', () => {
 
     const cyber = join(fixture, 'agency-cyber-security-web');
     rmSync(join(cyber, 'app', 'fonts'), { recursive: true });
+    // Simulate a site from the older base, before the shared UX floor: the migration must bring these back.
+    const floorFiles = ['app/ux-floor.css', 'app/design-floor/tokens.css', 'components/site-links.tsx', 'components/lang-text.tsx', 'app/opengraph-image.tsx'];
+    for (const file of floorFiles) rmSync(join(cyber, file));
     const migrated = run(['--input-type=module', '--eval', "const { migrateSites } = await import('./scripts/migrate-showcase-pseo.mjs'); await migrateSites({ onlySlugs: ['cyber-security'] });"]);
     assert.equal(migrated.status, 0, migrated.stdout + migrated.stderr);
     checkFonts(cyber);
+    for (const file of floorFiles) assert.ok(existsSync(join(cyber, file)), `migration restores ${file}`);
+    // Cyber's promise mixes Thai and English, so LangText splits it: its tests and build must still pass.
+    checkSiteToolchain(cyber, run);
   } finally {
     rmSync(fixture, { recursive: true, force: true });
   }

@@ -36,13 +36,16 @@ export function canonicalUrl(path: string) {
   return siteConfig.publicUrl ? absoluteUrl(path) : undefined;
 }
 
+const ogImage = { url: '/opengraph-image', width: 1200, height: 630, alt: site.name } as const;
+
 export function pageMetadata(title: string, description: string, path: string): Metadata {
   const canonical = canonicalUrl(path);
   return {
     title,
     description,
-    openGraph: { type: 'website', title, description, siteName: site.name },
-    twitter: { card: 'summary', title, description },
+    // Page-level openGraph replaces the layout's, so name the shared image (app/opengraph-image.tsx) here too.
+    openGraph: { type: 'website', title, description, siteName: site.name, images: [ogImage] },
+    twitter: { card: 'summary_large_image', title, description, images: [ogImage.url] },
     ...(canonical ? { alternates: { canonical } } : {}),
     robots: siteConfig.isIndexable ? { index: true, follow: true } : { index: false, follow: false },
   };

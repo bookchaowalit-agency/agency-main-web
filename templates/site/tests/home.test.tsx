@@ -14,8 +14,8 @@ const esc = (text: string) => text.replace(/&/g, '&amp;').replace(/</g, '&lt;').
 describe('home page', () => {
   it('renders the promise, scope, readiness and the no-intake notice', () => {
     const html = renderToString(<HomePage />);
-    expect(html).toContain(esc(site.promise));
-    for (const item of site.scope) expect(html).toContain(esc(item));
+    expect(html.replace(/<[^>]*>/g, "")).toContain(esc(site.promise));
+    for (const item of site.scope) expect(html.replace(/<[^>]*>/g, "")).toContain(esc(item));
     expect(html).toContain(esc(readinessCopy(site.status).label));
     expect(html).toContain('ยังไม่มี lead form หรือการรับข้อมูลลูกค้า');
     expect(html).toContain('no client claims');

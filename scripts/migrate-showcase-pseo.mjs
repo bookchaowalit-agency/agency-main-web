@@ -167,7 +167,8 @@ const notoSerifThai = localFont({
 });
 
 export const metadata: Metadata = {
-  metadataBase: new URL(siteConfig.metadataUrl),
+  // Only an approved public URL; without one Next.js uses the deployment URL, never localhost, for og:image.
+  ...(siteConfig.publicUrl ? { metadataBase: new URL(siteConfig.publicUrl) } : {}),
   title: { default: site.name + ' — ' + site.thaiName, template: '%s — ' + site.name },
   description: site.promise,
   openGraph: { type: 'website', locale: 'th_TH', siteName: site.name, title: site.name + ' — ' + site.thaiName, description: site.promise },
@@ -233,6 +234,7 @@ function componentTemplate() {
 function indexPageTemplate() {
   return `import Link from 'next/link';
 import { PseoHeader } from '@/components/pseo-page';
+import SiteLinks from '@/components/site-links';
 import { site } from '@/lib/site';
 import { pseoService } from '@/lib/pseo';
 import { pageMetadata } from '@/lib/site-config';
@@ -240,7 +242,7 @@ import { pageMetadata } from '@/lib/site-config';
 export const metadata = pageMetadata(site.name + ' service', pseoService.description, '/services');
 
 export default function ServicesPage() {
-  return <div className="pseo-shell"><PseoHeader /><main id="main-content" className="pseo-main"><section className="pseo-index-hero"><p className="pseo-eyebrow">SERVICE / PSEO PILOT</p><h1>เริ่มจาก service<br />ที่วัดผลได้</h1><p>หน้า service นี้อธิบาย workflow ตั้งต้นของ vertical แบบ public-safe เพื่อทดสอบ search intent และความพร้อมในการส่งมอบ ยังไม่มี lead form หรือการรับข้อมูลลูกค้า</p></section><section className="pseo-section"><Link className="pseo-index-card" href={\`/services/\${pseoService.slug}\`}><div><p className="pseo-eyebrow">{pseoService.name}</p><h2>{pseoService.title}</h2><p>{pseoService.intent}</p></div><span aria-hidden="true">↗</span></Link></section><footer className="pseo-footer"><span>{site.name} · service directory</span><span>public-safe · no inquiry intake</span></footer></main></div>;
+  return <div className="pseo-shell"><PseoHeader /><main id="main-content" className="pseo-main"><section className="pseo-index-hero"><p className="pseo-eyebrow">SERVICE / PSEO PILOT</p><h1>เริ่มจาก service<br />ที่วัดผลได้</h1><p>หน้า service นี้อธิบาย workflow ตั้งต้นของ vertical แบบ public-safe เพื่อทดสอบ search intent และความพร้อมในการส่งมอบ ยังไม่มี lead form หรือการรับข้อมูลลูกค้า</p></section><section className="pseo-section"><Link className="pseo-index-card" href={\`/services/\${pseoService.slug}\`}><div><p className="pseo-eyebrow">{pseoService.name}</p><h2>{pseoService.title}</h2><p>{pseoService.intent}</p></div><span aria-hidden="true">↗</span></Link></section><footer className="pseo-footer"><span>{site.name} · service directory</span><span>public-safe · no inquiry intake</span><SiteLinks /></footer></main></div>;
 }
 `;
 }
@@ -356,6 +358,11 @@ export async function migrateSites({ onlySlugs } = {}) {
     writeText(join(target, 'lib', 'pseo.ts'), pseoTypeScript(service, agency));
     writeText(join(target, 'lib', 'readiness.ts'), templateFile('lib/readiness.ts'));
     writeText(join(target, 'components', 'pseo-page.tsx'), componentTemplate());
+    // The layout, home and service pages written here import these: copy them so a site built from an older
+    // base still compiles after the migration.
+    for (const file of ['app/ux-floor.css', 'app/design-floor/tokens.css', 'components/site-links.tsx', 'components/lang-text.tsx', 'app/opengraph-image.tsx']) {
+      writeText(join(target, file), templateFile(file));
+    }
     writeText(join(target, 'app', 'layout.tsx'), layoutTemplate());
     writeText(join(target, 'app', 'services', 'page.tsx'), indexPageTemplate());
     writeText(join(target, 'app', 'services', '[slug]', 'page.tsx'), servicePageTemplate());
