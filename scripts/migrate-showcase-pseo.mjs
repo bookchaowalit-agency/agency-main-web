@@ -139,7 +139,7 @@ function layoutTemplate() {
 import localFont from 'next/font/local';
 import type { ReactNode } from 'react';
 import { site } from '@/lib/site';
-import { siteConfig } from '@/lib/site-config';
+import { siteConfig, socialImage } from '@/lib/site-config';
 import './design-floor/tokens.css';
 import './globals.css';
 import './ux-floor.css';
@@ -167,12 +167,12 @@ const notoSerifThai = localFont({
 });
 
 export const metadata: Metadata = {
-  // Only an approved public URL; without one Next.js uses the deployment URL, never localhost, for og:image.
-  ...(siteConfig.publicUrl ? { metadataBase: new URL(siteConfig.publicUrl) } : {}),
+  // The approved public URL, else the site's own production domain (lib/site.ts): og:image is never localhost.
+  metadataBase: new URL(siteConfig.metadataUrl),
   title: { default: site.name + ' — ' + site.thaiName, template: '%s — ' + site.name },
   description: site.promise,
-  openGraph: { type: 'website', locale: 'th_TH', siteName: site.name, title: site.name + ' — ' + site.thaiName, description: site.promise },
-  twitter: { card: 'summary_large_image', title: site.name + ' — ' + site.thaiName, description: site.promise },
+  openGraph: { type: 'website', locale: 'th_TH', siteName: site.name, title: site.name + ' — ' + site.thaiName, description: site.promise, images: [socialImage] },
+  twitter: { card: 'summary_large_image', title: site.name + ' — ' + site.thaiName, description: site.promise, images: [socialImage.url] },
   ...(siteConfig.publicUrl ? { alternates: { canonical: siteConfig.publicUrl } } : {}),
   robots: siteConfig.isIndexable ? { index: true, follow: true } : { index: false, follow: false },
 };
@@ -360,9 +360,11 @@ export async function migrateSites({ onlySlugs } = {}) {
     writeText(join(target, 'components', 'pseo-page.tsx'), componentTemplate());
     // The layout, home and service pages written here import these: copy them so a site built from an older
     // base still compiles after the migration.
-    for (const file of ['app/ux-floor.css', 'app/design-floor/tokens.css', 'components/site-links.tsx', 'components/lang-text.tsx', 'app/opengraph-image.tsx']) {
+    for (const file of ['app/ux-floor.css', 'app/design-floor/tokens.css', 'components/site-links.tsx', 'components/lang-text.tsx', 'app/og.png/route.tsx']) {
       writeText(join(target, file), templateFile(file));
     }
+    // The social card moved to app/og.png/route.tsx (a real .png in the export); two image sources would both emit og:image.
+    rmSync(join(target, 'app', 'opengraph-image.tsx'), { force: true });
     writeText(join(target, 'app', 'layout.tsx'), layoutTemplate());
     writeText(join(target, 'app', 'services', 'page.tsx'), indexPageTemplate());
     writeText(join(target, 'app', 'services', '[slug]', 'page.tsx'), servicePageTemplate());

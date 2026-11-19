@@ -18,12 +18,17 @@ function parsePublicUrl(value: string | undefined) {
 }
 
 const publicUrl = parsePublicUrl(configuredUrl);
+// The site's own production domain (lib/site.ts): absolute URLs in metadata (og:image, twitter:image) fall back to it,
+// never to localhost. Canonical links and indexing still need the approved NEXT_PUBLIC_SITE_URL.
+const productionUrl = parsePublicUrl(site.design.productionUrl);
+if (!productionUrl?.startsWith('https://')) throw new Error('lib/site.ts design.productionUrl must be an https URL');
 
 export const siteConfig = {
   name: site.name,
   description: site.promise,
   publicUrl,
-  metadataUrl: publicUrl ?? 'http://localhost:3010',
+  productionUrl,
+  metadataUrl: publicUrl ?? productionUrl,
   isIndexable: Boolean(publicUrl) && process.env.NEXT_PUBLIC_SITE_INDEXABLE === 'true',
 } as const;
 
@@ -36,16 +41,17 @@ export function canonicalUrl(path: string) {
   return siteConfig.publicUrl ? absoluteUrl(path) : undefined;
 }
 
-const ogImage = { url: '/opengraph-image', width: 1200, height: 630, alt: site.name } as const;
+// Served by app/og.png/route.tsx, which the static export writes as out/og.png (a real .png, so image/png).
+export const socialImage = { url: absoluteUrl('/og.png'), width: 1200, height: 630, alt: site.name + ' — ' + site.design.world } as const;
 
 export function pageMetadata(title: string, description: string, path: string): Metadata {
   const canonical = canonicalUrl(path);
   return {
     title,
     description,
-    // Page-level openGraph replaces the layout's, so name the shared image (app/opengraph-image.tsx) here too.
-    openGraph: { type: 'website', title, description, siteName: site.name, images: [ogImage] },
-    twitter: { card: 'summary_large_image', title, description, images: [ogImage.url] },
+    // Page-level openGraph replaces the layout's, so name the shared image here too.
+    openGraph: { type: 'website', title, description, siteName: site.name, images: [socialImage] },
+    twitter: { card: 'summary_large_image', title, description, images: [socialImage.url] },
     ...(canonical ? { alternates: { canonical } } : {}),
     robots: siteConfig.isIndexable ? { index: true, follow: true } : { index: false, follow: false },
   };

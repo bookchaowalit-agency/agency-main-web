@@ -17,6 +17,7 @@ const siteTemplate = join(baseRepo, 'templates', 'site');
 const designBySlug = {
   talent: {
     projectName: 'solo-agency-talent',
+    productionUrl: 'https://solo-agency-talent.vercel.app',
     archetype: 'editorial',
     motif: 'editorial',
     world: 'Editorial talent dossier',
@@ -27,6 +28,7 @@ const designBySlug = {
   },
   'cyber-security': {
     projectName: 'solo-agency-cyber-security',
+    productionUrl: 'https://solo-agency-cyber-security.vercel.app',
     archetype: 'terminal',
     motif: 'terminal',
     world: 'Security operations console',
@@ -37,6 +39,7 @@ const designBySlug = {
   },
   technology: {
     projectName: 'solo-agency-technology',
+    productionUrl: 'https://solo-agency-technology.vercel.app',
     archetype: 'blueprint',
     motif: 'blueprint',
     world: 'Systems blueprint',
@@ -47,6 +50,7 @@ const designBySlug = {
   },
   'governance-risk': {
     projectName: 'solo-agency-governance-risk',
+    productionUrl: 'https://solo-agency-governance-risk.vercel.app',
     archetype: 'boardpaper',
     motif: 'boardpaper',
     world: 'Board paper and control register',
@@ -57,6 +61,7 @@ const designBySlug = {
   },
   'transactions-corporate-finance': {
     projectName: 'solo-agency-transactions-corporate-finance',
+    productionUrl: 'https://solo-agency-transactions-corporate.vercel.app',
     archetype: 'dealroom',
     motif: 'dealroom',
     world: 'Deal room evidence board',
@@ -67,6 +72,7 @@ const designBySlug = {
   },
   'industrial-infrastructure': {
     projectName: 'solo-agency-industrial-infrastructure',
+    productionUrl: 'https://solo-agency-industrial-infrastructu.vercel.app',
     archetype: 'fieldmanual',
     motif: 'fieldmanual',
     world: 'Field manual for physical systems',
@@ -77,6 +83,7 @@ const designBySlug = {
   },
   'science-deep-tech': {
     projectName: 'solo-agency-science-deep-tech',
+    productionUrl: 'https://solo-agency-science-deep-tech.vercel.app',
     archetype: 'labnote',
     motif: 'labnote',
     world: 'Lab notebook for commercialization',
@@ -87,6 +94,7 @@ const designBySlug = {
   },
   legal: {
     projectName: 'solo-agency-legal',
+    productionUrl: 'https://solo-agency-legal.vercel.app',
     archetype: 'chambers',
     motif: 'chambers',
     world: 'Chambers folio and redline',
@@ -97,6 +105,7 @@ const designBySlug = {
   },
   'investment-asset-management': {
     projectName: 'solo-agency-investment-asset-management',
+    productionUrl: 'https://solo-agency-investment-asset-manage.vercel.app',
     archetype: 'capitalledger',
     motif: 'capitalledger',
     world: 'Capital allocation ledger',
@@ -107,6 +116,7 @@ const designBySlug = {
   },
   healthcare: {
     projectName: 'solo-agency-healthcare',
+    productionUrl: 'https://solo-agency-healthcare.vercel.app',
     archetype: 'clinical',
     motif: 'clinical',
     world: 'Clinical readiness surface',
@@ -117,6 +127,7 @@ const designBySlug = {
   },
   'real-estate': {
     projectName: 'solo-agency-real-estate',
+    productionUrl: 'https://solo-agency-real-estate.vercel.app',
     archetype: 'architectural',
     motif: 'architectural',
     world: 'Architectural plan for property operations',
@@ -127,6 +138,7 @@ const designBySlug = {
   },
   energy: {
     projectName: 'solo-agency-energy',
+    productionUrl: 'https://solo-agency-energy.vercel.app',
     archetype: 'solarfield',
     motif: 'solarfield',
     world: 'Solar field and project map',
@@ -137,6 +149,7 @@ const designBySlug = {
   },
   'defense-aerospace': {
     projectName: 'solo-agency-defense-aerospace',
+    productionUrl: 'https://solo-agency-defense-aerospace.vercel.app',
     archetype: 'missionbrief',
     motif: 'missionbrief',
     world: 'Mission assurance brief',
@@ -147,6 +160,7 @@ const designBySlug = {
   },
   'insurance-risk-transfer': {
     projectName: 'solo-agency-insurance-risk-transfer',
+    productionUrl: 'https://solo-agency-insurance-risk-transfer.vercel.app',
     archetype: 'riskmatrix',
     motif: 'riskmatrix',
     world: 'Risk matrix and transfer map',

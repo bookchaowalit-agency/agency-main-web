@@ -19,10 +19,12 @@ afterEach(() => {
 });
 
 describe('site config', () => {
-  it('is noindex with a localhost metadata URL when no public URL is set', async () => {
-    const { siteConfig, canonicalUrl, pageMetadata } = await loadConfig({ NEXT_PUBLIC_SITE_URL: undefined, NEXT_PUBLIC_SITE_INDEXABLE: 'true' });
+  it('is noindex with the production-domain metadata URL (never localhost) when no public URL is set', async () => {
+    const { siteConfig, canonicalUrl, pageMetadata, socialImage } = await loadConfig({ NEXT_PUBLIC_SITE_URL: undefined, NEXT_PUBLIC_SITE_INDEXABLE: 'true' });
     expect(siteConfig.publicUrl).toBeUndefined();
-    expect(siteConfig.metadataUrl).toBe('http://localhost:3010');
+    expect(siteConfig.metadataUrl).toMatch(/^https:\/\/[^/]+$/);
+    expect(siteConfig.metadataUrl).toBe(siteConfig.productionUrl);
+    expect(socialImage.url).toBe(siteConfig.productionUrl + '/og.png');
     expect(siteConfig.isIndexable).toBe(false);
     expect(canonicalUrl('/services')).toBeUndefined();
     const meta = pageMetadata('T', 'D', '/services');
@@ -66,6 +68,7 @@ describe('site config', () => {
     const meta = approved.pageMetadata('T', 'D', '/services');
     expect(meta.robots).toEqual({ index: true, follow: true });
     expect(meta.alternates).toEqual({ canonical: 'https://example.com/services' });
+    expect(meta.openGraph?.images).toEqual([expect.objectContaining({ url: 'https://example.com/og.png' })]);
   });
 });
 

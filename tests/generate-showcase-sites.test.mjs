@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict';
 import { createHash } from 'node:crypto';
-import { cpSync, existsSync, mkdirSync, mkdtempSync, readdirSync, readFileSync, rmSync, symlinkSync, unlinkSync } from 'node:fs';
+import { cpSync, existsSync, mkdirSync, mkdtempSync, readdirSync, readFileSync, rmSync, symlinkSync, unlinkSync, writeFileSync } from 'node:fs';
 import { createRequire } from 'node:module';
 import { tmpdir } from 'node:os';
 import { join, relative } from 'node:path';
@@ -147,12 +147,17 @@ test('showcase tools package local fonts and preserve existing targets', () => {
     const cyber = join(fixture, 'agency-cyber-security-web');
     rmSync(join(cyber, 'app', 'fonts'), { recursive: true });
     // Simulate a site from the older base, before the shared UX floor: the migration must bring these back.
-    const floorFiles = ['app/ux-floor.css', 'app/design-floor/tokens.css', 'components/site-links.tsx', 'components/lang-text.tsx', 'app/opengraph-image.tsx'];
+    const floorFiles = ['app/ux-floor.css', 'app/design-floor/tokens.css', 'components/site-links.tsx', 'components/lang-text.tsx', 'app/og.png/route.tsx'];
     for (const file of floorFiles) rmSync(join(cyber, file));
+    // Older sites carry the extensionless opengraph-image convention file; the migration replaces it with og.png.
+    writeFileSync(join(cyber, 'app', 'opengraph-image.tsx'), 'export default function OpenGraphImage() { return null; }\n');
     const migrated = run(['--input-type=module', '--eval', "const { migrateSites } = await import('./scripts/migrate-showcase-pseo.mjs'); await migrateSites({ onlySlugs: ['cyber-security'] });"]);
     assert.equal(migrated.status, 0, migrated.stdout + migrated.stderr);
     checkFonts(cyber);
     for (const file of floorFiles) assert.ok(existsSync(join(cyber, file)), `migration restores ${file}`);
+    assert.ok(!existsSync(join(cyber, 'app', 'opengraph-image.tsx')), 'migration removes the old opengraph-image file');
+    const cyberSite = readFileSync(join(cyber, 'lib', 'site.ts'), 'utf8');
+    assert.match(cyberSite, /"productionUrl": "https:\/\/[a-z0-9-]+\.vercel\.app"/);
     // Cyber's promise mixes Thai and English, so LangText splits it: its tests and build must still pass.
     checkSiteToolchain(cyber, run);
   } finally {
