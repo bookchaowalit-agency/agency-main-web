@@ -1,7 +1,7 @@
 import Link from 'next/link';
 import { agencies, sharedCore } from '@/lib/agency-portfolio';
 import { pageMetadata } from '@/lib/site-config';
-import SiteLinks from '@/components/site-links';
+import { SiteFooter } from '@/components/site-footer';
 
 const formatAgencyNumber = (number: number) => String(number).padStart(2, '0');
 
@@ -38,7 +38,7 @@ export default function AgenciesPage() {
         <div className="core-grid">{sharedCore.map((core, index) => <article className="core-card" key={core.name}><span>0{index + 1}</span><h3>{core.name}</h3><p>{core.thaiName}</p><small>{core.items}</small></article>)}</div>
       </section>
 
-      <footer className="site-footer"><span>Solo Empire Group · portfolio preview</span><span><Link href="/">Home</Link><i>·</i><Link href="/agencies">14 verticals</Link></span><SiteLinks /></footer>
+      <SiteFooter label="portfolio preview" />
     </main>
   );
 }

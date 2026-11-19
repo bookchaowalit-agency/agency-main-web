@@ -2,14 +2,14 @@
  * Apple-like sales shell (2026-11-13): one calm light theme, sans headings, white rounded cards,
  * pill buttons, one dark card style for emphasis. Class names are unchanged, so page markup and
  * every pSEO page's words stay exactly as approved; only the look changes.
- * Text pairs pass 4.5:1: --ink on --bg 15.9:1, --muted on --bg 4.7:1 and on white 5.1:1,
+ * Text pairs pass 4.5:1: --ink on --bg 15.9:1, --muted on --bg 5.6:1 and on white 6.0:1,
  * --accent on white 5.7:1, --on-dark-muted on --dark 7.4:1.
  */
 :root {
   --bg: #f5f5f7;
   --surface: #ffffff;
   --ink: #1d1d1f;
-  --muted: #6e6e73;
+  --muted: #636366;
   --line: #d2d2d7;
   --line-soft: #e5e5ea;
   --accent: #0066cc;
@@ -56,7 +56,7 @@ a { color: inherit; }
 .lede, .home-lede { max-width: 680px; margin-top: 16px; color: var(--muted); font-size: clamp(18px, 2vw, 21px); line-height: 1.6; }
 
 /* Home: centred hero, one primary action, three plain doors. */
-.public-home { display: flex; min-height: calc(100vh - 56px); flex-direction: column; align-items: center; padding-top: clamp(56px, 12vh, 128px); text-align: center; }
+.public-home { display: flex; min-height: calc(100vh - 56px); flex-direction: column; align-items: center; padding-top: clamp(40px, 8vh, 96px); text-align: center; }
 .home-mark { width: 56px; height: 56px; margin-bottom: 24px; border-radius: 16px; font-size: 15px; }
 .public-home h1 { max-width: 900px; margin-top: 12px; font-size: clamp(44px, 8vw, 88px); font-weight: 700; letter-spacing: -.03em; line-height: 1.05; }
 .public-home h1 em { display: block; color: var(--muted); font-style: normal; }
@@ -65,6 +65,9 @@ a { color: inherit; }
 .home-directories { display: flex; flex-wrap: wrap; justify-content: center; gap: 4px 8px; margin-top: 16px; }
 .home-directories a { display: inline-flex; align-items: center; gap: 6px; min-height: 44px; padding: 0 14px; border-radius: 980px; color: var(--accent); font-size: 17px; text-decoration: none; }
 .home-directories a:hover { background: rgb(0 102 204 / 8%); }
+/* Three real verticals under the directory links (cards keep the portfolio look, left-aligned). */
+.home-featured { display: grid; width: 100%; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; margin-top: 40px; text-align: left; }
+.home-featured .agency-card { min-height: 220px; }
 .home-note { max-width: 560px; margin-top: 40px; color: var(--muted); font-size: 14px; line-height: 1.7; }
 
 /* Buttons and links */
@@ -102,10 +105,12 @@ a { color: inherit; }
 .agency-card { display: flex; min-height: 240px; min-width: 0; flex-direction: column; justify-content: space-between; padding: 24px; }
 .card-top, .card-footer { display: flex; align-items: center; justify-content: space-between; gap: 12px; min-width: 0; color: var(--muted); font-size: 13px; }
 .card-top > span:first-child, .card-footer > span:first-child { min-width: 0; overflow-wrap: anywhere; }
-.status { padding: 2px 10px; border-radius: 980px; background: var(--bg); color: var(--muted); font-size: 12px; font-weight: 600; white-space: nowrap; }
+/* #515154 on #f5f5f7 is 7.4:1 for the 12px label. */
+.status { padding: 2px 10px; border: 1px solid transparent; border-radius: 980px; background: var(--bg); color: #515154; font-size: 12px; font-weight: 600; white-space: nowrap; }
 .status-incubating { color: #ffffff; background: var(--ink); }
-.status-locked { color: var(--muted); }
-.agency-card h3 { margin-top: 16px; font-size: 24px; font-weight: 700; line-height: 1.25; overflow-wrap: anywhere; }
+/* Locked reads differently from target: dashed outline, no fill. */
+.status-locked { color: #515154; background: transparent; border: 1px dashed var(--line); }
+.agency-card h3, .agency-card .card-title { margin-top: 16px; font-size: 24px; font-weight: 700; line-height: 1.25; overflow-wrap: anywhere; }
 .card-thai { margin-top: 4px; color: var(--muted); font-size: 14px; overflow-wrap: anywhere; }
 .card-copy { margin-top: 12px; color: var(--ink); font-size: 15px; line-height: 1.6; overflow-wrap: anywhere; }
 .card-footer { margin-top: 16px; padding-top: 12px; border-top: 1px solid var(--line-soft); }
@@ -180,14 +185,17 @@ a { color: inherit; }
 .site-links { display: flex; flex-wrap: wrap; gap: 0 20px; font-size: 14px; }
 .site-links a { display: inline-flex; align-items: center; min-height: 44px; color: inherit; text-decoration: none; }
 .site-links a:hover { color: var(--ink); text-decoration: underline; text-underline-offset: 4px; }
-.public-home .site-links { justify-content: center; margin-top: 24px; color: var(--muted); }
+.public-home .site-footer { width: 100%; margin-top: 48px; text-align: left; }
 
 @media (max-width: 900px) {
   .agency-grid, .core-grid, .pseo-related-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .pseo-steps { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   /* Keep every link on small screens: the nav becomes a scrollable row under the brand. */
   .site-header { position: static; flex-wrap: wrap; gap: 0; padding-top: 4px; padding-bottom: 4px; }
-  .site-header nav { width: calc(100% + 20px); margin: 0 -10px; flex-wrap: nowrap; overflow-x: auto; scrollbar-width: none; }
+  /* The hidden scrollbar gives no hint that more links sit off-screen, so fade the right edge. */
+  .site-header nav { width: calc(100% + 20px); margin: 0 -10px; flex-wrap: nowrap; overflow-x: auto; scrollbar-width: none; -webkit-mask-image: linear-gradient(90deg, #000 85%, transparent); mask-image: linear-gradient(90deg, #000 85%, transparent); }
+  .site-header nav::after { flex: 0 0 32px; content: ''; }
+  .home-featured { grid-template-columns: 1fr; }
   .site-header nav a { white-space: nowrap; }
 }
 

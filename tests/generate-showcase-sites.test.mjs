@@ -56,7 +56,7 @@ function checkSiteTemplate(site) {
   assert.deepEqual(pkg.dependencies, base.dependencies, 'site dependencies must match the copied lockfile');
   assert.deepEqual(pkg.devDependencies, base.devDependencies, 'site devDependencies must match the copied lockfile');
   assert.deepEqual(pkg.overrides, base.overrides, 'site overrides must match the copied lockfile');
-  assert.equal(pkg.dependencies.next, '16.4.2');
+  assert.equal(pkg.dependencies.next, '16.4.5');
   assert.ok(!('eslint-config-next' in pkg.dependencies), 'eslint-config-next is a devDependency');
   for (const script of ['lint', 'typecheck', 'test', 'check']) assert.ok(pkg.scripts[script], `missing ${script} script`);
   const ci = readFileSync(join(site, '.github', 'workflows', 'ci.yml'), 'utf8');

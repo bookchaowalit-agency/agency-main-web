@@ -23,6 +23,16 @@ describe('portfolio pages', () => {
     expect(html).not.toMatch(/<form/);
   });
 
+  it('home shows three real verticals, the shared footer and a link back to the hub', () => {
+    const html = renderToString(<HomePage />);
+    for (const slug of ['talent', 'cyber-security', 'governance-risk']) expect(html).toContain(`href="/agencies/${slug}"`);
+    expect(html).toContain('class="site-footer"');
+    expect(html).toContain('href="https://bookchaowalit.com"');
+    expect(html).toMatch(/<h1 lang="en"/);
+    // The header brand returns to the home page from every page.
+    expect(html).toMatch(/class="site-brand" href="\/"/);
+  });
+
   it('agency directory lists all fourteen verticals', () => {
     const html = renderToString(<AgenciesPage />);
     for (const agency of agencies) expect(html).toContain(esc(agency.name));
