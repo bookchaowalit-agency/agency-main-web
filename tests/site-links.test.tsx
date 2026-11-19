@@ -33,7 +33,9 @@ describe('site links and text floor', () => {
 
   it('drops the narrow-screen nav fade while a nav link has keyboard focus', () => {
     const css = readFileSync('app/globals.css', 'utf8');
-    expect(css).toMatch(/\.site-header nav \{[^}]*mask-image: linear-gradient/);
+    expect(css).toMatch(/\.site-header nav\[data-overflow="true"\] \{[^}]*mask-image: linear-gradient/);
+    // Same specificity as the fade rule, so it must come after it.
+    expect(css.indexOf('.site-header nav:focus-within')).toBeGreaterThan(css.indexOf('.site-header nav[data-overflow="true"] {'));
     expect(css).toMatch(/\.site-header nav:focus-within \{[^}]*-webkit-mask-image: none;[^}]*mask-image: none;/);
   });
 });

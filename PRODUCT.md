@@ -38,6 +38,10 @@ The owner: a content baseline and the scaffold for new agency sites. It is not a
 - None. This repository has no Vercel project and is never deployed (`deployment_skipped_no_target`). The public
   showcase is the fourteen `agency-<slug>-web` repositories, one `solo-agency-*` Vercel project each.
 
+## Known limits
+
+- `scripts/migrate-showcase-pseo.mjs` (already run on all 14 sites, so left as is): it does not update an older showcase home page that already links its service page (no hub links or "not open" label added there), it does not clear stale `.next/types` after removing `app/og.png/route.tsx` (run `next build` or delete `.next` before `tsc`), and it does not handle CRLF line endings (projectName regex and the opengraph-test hash expect LF).
+
 ## Boundaries
 
 - Static export only; keep `npm run check` (tests, typecheck, build) passing.
