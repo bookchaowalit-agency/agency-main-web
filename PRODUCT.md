@@ -43,6 +43,7 @@ The owner: a content baseline and the scaffold for new agency sites. It is not a
 - `scripts/migrate-showcase-pseo.mjs` (already run on all 14 sites, so left as is): it does not update an older showcase home page that already links its service page (no hub links or "not open" label added there), it does not clear stale `.next/types` after removing `app/og.png/route.tsx` (run `next build` or delete `.next` before `tsc`), and it does not handle CRLF line endings (projectName regex and the opengraph-test hash expect LF).
 - The same migration writes `public/og.png` and `lib/og-manifest.json` but does not install `tests/opengraph.test.tsx` on a site that never had one, so such a site would not catch a stale card; all 14 sites already carry the test.
 - The migration removes `app/opengraph-image.tsx` / `app/og.png/route.tsx` even when a site's own test still imports it (it only reports "Review by hand" afterwards), so such a site fails tsc/Vitest until that test is updated; it does not stop before deleting.
+- The showcase footer's Contact link (a `mailto:`) is not labelled as site feedback, so it can read as an inquiry channel while intake is closed. Relabelling it is a template change that needs a 14-site rollout; it waits for the next agency template change.
 
 ## Boundaries
 
