@@ -4,6 +4,7 @@ import {
   existsSync,
   mkdirSync,
   mkdtempSync,
+  readdirSync,
   readFileSync,
   rmSync,
   writeFileSync,
@@ -11,6 +12,7 @@ import {
 import { dirname, join } from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 import { tmpdir } from 'node:os';
+import { productionUrls } from './showcase-domains.mjs';
 
 const require = createRequire(import.meta.url);
 const typescript = require('typescript');
@@ -287,15 +289,46 @@ export default function sitemap(): MetadataRoute.Sitemap {
 }
 
 function robotsTemplate() {
-  return `import type { MetadataRoute } from 'next';
-import { absoluteUrl, siteConfig } from '@/lib/site-config';
-
-export const dynamic = 'force-static';
-
-export default function robots(): MetadataRoute.Robots {
-  return siteConfig.isIndexable ? { rules: { userAgent: '*', allow: '/' }, sitemap: absoluteUrl('/sitemap.xml') } : { rules: { userAgent: '*', disallow: '/' } };
+  return templateFile('app/robots.ts');
 }
-`;
+
+// Older sites have no design.productionUrl in lib/site.ts; the rewritten site-config needs it (og:image never falls
+// back to localhost), so add the site's live domain next to projectName and keep every other design value.
+function backfillProductionUrl(sitePath, slug) {
+  const url = productionUrls[slug];
+  if (!url) throw new Error('No production URL for ' + slug + ' in scripts/showcase-domains.mjs');
+  const source = readFileSync(sitePath, 'utf8');
+  if (source.includes('"productionUrl"')) return;
+  const updated = source.replace(/^(\s*)("projectName": "[^"]*",\n)/m, (_match, indent, line) => indent + line + indent + '"productionUrl": ' + JSON.stringify(url) + ',\n');
+  if (updated === source) throw new Error('Cannot find design.projectName in ' + sitePath);
+  writeText(sitePath, updated);
+}
+
+// Tests written for the extensionless app/opengraph-image module and the localhost metadata URL: replace or update
+// them along with the route, so a migrated site still typechecks and passes Vitest.
+const legacyTestFixes = [
+  ["expect(siteConfig.metadataUrl).toBe('http://localhost:3010');", "expect(siteConfig.metadataUrl).toBe(siteConfig.productionUrl);"],
+  ['expect(siteConfig.metadataUrl).toBe("http://localhost:3010");', 'expect(siteConfig.metadataUrl).toBe(siteConfig.productionUrl);'],
+  ["expect(JSON.stringify(meta.openGraph)).toContain('/opengraph-image');", "expect(JSON.stringify(meta.openGraph)).toContain('/og.png');"],
+  ["{ rules: { userAgent: '*', disallow: '/' } }", "{ rules: [{ userAgent: expect.arrayContaining(['Twitterbot', 'facebookexternalhit']), allow: '/' }, { userAgent: '*', disallow: '/' }] }"],
+  ['{ rules: { userAgent: "*", disallow: "/" } }', "{ rules: [{ userAgent: expect.arrayContaining(['Twitterbot', 'facebookexternalhit']), allow: '/' }, { userAgent: '*', disallow: '/' }] }"],
+];
+
+function migrateLegacyTests(target) {
+  const testsDir = join(target, 'tests');
+  if (!existsSync(testsDir)) return;
+  for (const name of readdirSync(testsDir)) {
+    if (!/\.test\.tsx?$/.test(name)) continue;
+    const path = join(testsDir, name);
+    const source = readFileSync(path, 'utf8');
+    if (source.includes('@/app/opengraph-image')) {
+      writeText(path, templateFile('tests/opengraph.test.tsx'));
+      continue;
+    }
+    let updated = source;
+    for (const [from, to] of legacyTestFixes) updated = updated.split(from).join(to);
+    if (updated !== source) writeText(path, updated);
+  }
 }
 
 function patchHomePage(path, service) {
@@ -354,6 +387,7 @@ export async function migrateSites({ onlySlugs } = {}) {
     for (const file of ['NotoSansThai-Variable.woff2', 'NotoSerifThai-Variable.woff2', 'OFL.txt', 'README.md']) {
       copyFileSync(join(baseRepo, 'app', 'fonts', file), join(target, 'app', 'fonts', file));
     }
+    backfillProductionUrl(join(target, 'lib', 'site.ts'), agency.slug);
     writeText(join(target, 'lib', 'site-config.ts'), siteConfigTemplate());
     writeText(join(target, 'lib', 'pseo.ts'), pseoTypeScript(service, agency));
     writeText(join(target, 'lib', 'readiness.ts'), templateFile('lib/readiness.ts'));
@@ -365,6 +399,7 @@ export async function migrateSites({ onlySlugs } = {}) {
     }
     // The social card moved to app/og.png/route.tsx (a real .png in the export); two image sources would both emit og:image.
     rmSync(join(target, 'app', 'opengraph-image.tsx'), { force: true });
+    migrateLegacyTests(target);
     writeText(join(target, 'app', 'layout.tsx'), layoutTemplate());
     writeText(join(target, 'app', 'services', 'page.tsx'), indexPageTemplate());
     writeText(join(target, 'app', 'services', '[slug]', 'page.tsx'), servicePageTemplate());

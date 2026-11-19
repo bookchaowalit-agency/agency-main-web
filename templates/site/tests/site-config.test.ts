@@ -73,9 +73,9 @@ describe('site config', () => {
 });
 
 describe('robots and sitemap', () => {
-  it('disallow everything and list nothing by default', async () => {
+  it('disallow search crawlers and list nothing by default, but let link-preview bots fetch the social card', async () => {
     const { robots, sitemap } = await loadRoutes({ NEXT_PUBLIC_SITE_URL: undefined, NEXT_PUBLIC_SITE_INDEXABLE: undefined });
-    expect(robots).toEqual({ rules: { userAgent: '*', disallow: '/' } });
+    expect(robots).toEqual({ rules: [{ userAgent: expect.arrayContaining(['Twitterbot', 'facebookexternalhit']), allow: '/' }, { userAgent: '*', disallow: '/' }] });
     expect(sitemap).toEqual([]);
   });
 

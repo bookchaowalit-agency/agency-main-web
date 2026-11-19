@@ -196,6 +196,9 @@ a { color: inherit; }
   .site-header { position: static; flex-wrap: wrap; gap: 0; padding-top: 4px; padding-bottom: 4px; }
   /* The hidden scrollbar gives no hint that more links sit off-screen, so fade the right edge. */
   .site-header nav { width: calc(100% + 20px); margin: 0 -10px; flex-wrap: nowrap; overflow-x: auto; scrollbar-width: none; -webkit-mask-image: linear-gradient(90deg, #000 calc(100% - 40px), transparent); mask-image: linear-gradient(90deg, #000 calc(100% - 40px), transparent); }
+  /* A focused link can sit inside the scroll box yet under the fade (the browser does not scroll it): drop the fade
+     while the nav has keyboard focus so the link and its focus ring show in full. */
+  .site-header nav:focus-within { -webkit-mask-image: none; mask-image: none; }
   /* Spacer wider than the fade, so the last link is fully opaque once scrolled to the end. */
   .site-header nav::after { flex: 0 0 48px; content: ''; }
   .home-featured { grid-template-columns: 1fr; }

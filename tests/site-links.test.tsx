@@ -30,4 +30,10 @@ describe('site links and text floor', () => {
     );
     expect(small).toEqual([]);
   });
+
+  it('drops the narrow-screen nav fade while a nav link has keyboard focus', () => {
+    const css = readFileSync('app/globals.css', 'utf8');
+    expect(css).toMatch(/\.site-header nav \{[^}]*mask-image: linear-gradient/);
+    expect(css).toMatch(/\.site-header nav:focus-within \{[^}]*-webkit-mask-image: none;[^}]*mask-image: none;/);
+  });
 });
