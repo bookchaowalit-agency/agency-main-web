@@ -309,6 +309,8 @@ function backfillProductionUrl(sitePath, slug) {
 // Tests written for the extensionless app/opengraph-image module or the app/og.png route, and the localhost metadata URL: replace or update
 // them along with the route, so a migrated site still typechecks and passes Vitest.
 const legacyTestFixes = [
+  // The shared footer no longer links the hub or the portfolio on every page (pSEO plan: no sitewide cross-site links).
+  ["      expect(html).toContain('href=\"https://bookchaowalit.com\"');\n      expect(html).toContain('href=\"https://agency.bookchaowalit.com/agencies\"');\n", "      expect(html).toContain('href=\"https://bookchaowalit.com/privacy\"');\n"],
   ["expect(siteConfig.metadataUrl).toBe('http://localhost:3010');", "expect(siteConfig.metadataUrl).toBe(siteConfig.productionUrl);"],
   ['expect(siteConfig.metadataUrl).toBe("http://localhost:3010");', 'expect(siteConfig.metadataUrl).toBe(siteConfig.productionUrl);'],
   ["expect(JSON.stringify(meta.openGraph)).toContain('/opengraph-image');", "expect(JSON.stringify(meta.openGraph)).toContain('/og.png');"],
