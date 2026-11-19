@@ -1,3 +1,4 @@
+import { createHash } from 'node:crypto';
 import { createRequire } from 'node:module';
 import {
   copyFileSync,
@@ -315,16 +316,31 @@ const legacyTestFixes = [
   ['{ rules: { userAgent: "*", disallow: "/" } }', "{ rules: [{ userAgent: expect.arrayContaining(['Twitterbot', 'facebookexternalhit']), allow: '/' }, { userAgent: '*', disallow: '/' }] }"],
 ];
 
-function migrateLegacyTests(target) {
+// sha256 of every earlier templates/site/tests/opengraph.test.tsx: 069dc57 (opengraph-image module), 0e0a796
+// (app/og.png route) and 1b97347 = fa8a62b (static public/og.png, before the manifest check).
+const STANDARD_OG_TESTS = new Set([
+  'f4663b6f7831d5546213416634b6dfb148a8b69fc8afffce7c248cb7db28b8ef',
+  '7b4b3867f0b4c1788f125a44446585647e4c586a1b6f92527c5fa0a1fbc0de6a',
+  '0acce19bbe2b5d658b1fd4885160b477fbd3d05988c0b87c525affdd2595f723',
+]);
+
+/** Tests that still import a removed social-card module but are the site's own: listed, never overwritten. */
+function migrateLegacyTests(target, handUpdates = []) {
   const testsDir = join(target, 'tests');
   if (!existsSync(testsDir)) return;
   for (const name of readdirSync(testsDir)) {
     if (!/\.test\.tsx?$/.test(name)) continue;
     const path = join(testsDir, name);
     const source = readFileSync(path, 'utf8');
-    // Both older social-card modules: the extensionless opengraph-image and the app/og.png route handler.
-    if (source.includes('@/app/opengraph-image') || source.includes('@/app/og.png/route')) {
-      writeText(path, templateFile('tests/opengraph.test.tsx'));
+    // An earlier copy of the template's own opengraph test is replaced whole by the current one. A site's own test
+    // that still imports an old social-card module (the extensionless opengraph-image or the app/og.png route) is
+    // kept as written: it is reported for a hand update instead of being overwritten.
+    if (name === 'opengraph.test.tsx' && STANDARD_OG_TESTS.has(createHash('sha256').update(source).digest('hex'))) {
+      if (source !== templateFile('tests/opengraph.test.tsx')) writeText(path, templateFile('tests/opengraph.test.tsx'));
+      continue;
+    }
+    if (/from ['"]@\/app\/(opengraph-image|og\.png\/route)['"]|import\(['"]@\/app\/(opengraph-image|og\.png\/route)['"]\)/.test(source)) {
+      handUpdates.push(join('tests', name));
       continue;
     }
     let updated = source;
@@ -396,7 +412,7 @@ export async function migrateSites({ onlySlugs } = {}) {
     writeText(join(target, 'components', 'pseo-page.tsx'), componentTemplate());
     // The layout, home and service pages written here import these: copy them so a site built from an older
     // base still compiles after the migration.
-    for (const file of ['app/ux-floor.css', 'app/design-floor/tokens.css', 'components/site-links.tsx', 'components/lang-text.tsx', 'lib/og-card.ts', 'scripts/og.mjs']) {
+    for (const file of ['app/ux-floor.css', 'app/design-floor/tokens.css', 'components/site-links.tsx', 'components/lang-text.tsx', 'lib/og-card.ts', 'scripts/og.mjs', 'scripts/load-ts.mjs']) {
       writeText(join(target, file), templateFile(file));
     }
     // The social card is a committed public/og.png (a real .png in the export, no route handler: AGENTS.md
@@ -405,7 +421,9 @@ export async function migrateSites({ onlySlugs } = {}) {
     rmSync(join(target, 'app', 'opengraph-image.tsx'), { force: true });
     rmSync(join(target, 'app', 'og.png'), { recursive: true, force: true });
     await writeOgPng(target);
-    migrateLegacyTests(target);
+    const handUpdates = [];
+    migrateLegacyTests(target, handUpdates);
+    for (const file of handUpdates) console.warn('Review by hand: ' + join(target, file) + ' still imports a removed social-card module (now public/og.png, lib/og-card.ts).');
     writeText(join(target, 'app', 'layout.tsx'), layoutTemplate());
     writeText(join(target, 'app', 'services', 'page.tsx'), indexPageTemplate());
     writeText(join(target, 'app', 'services', '[slug]', 'page.tsx'), servicePageTemplate());

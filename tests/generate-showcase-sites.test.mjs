@@ -175,8 +175,15 @@ test('showcase tools package local fonts and preserve existing targets', () => {
     mkdirSync(join(talent, 'app', 'og.png'), { recursive: true });
     cpSync(join(legacy, 'og-route.tsx.txt'), join(talent, 'app', 'og.png', 'route.tsx'));
     cpSync(join(legacy, 'og-route.test.tsx.txt'), join(talent, 'tests', 'opengraph.test.tsx'));
+    // The site's own test that still imports the route (with a test of its own) is kept and reported, not overwritten.
+    const custom = "// Talent's own check.\nimport { it, expect } from 'vitest';\nit('keeps the card route', async () => { expect(await import('@/app/og.png/route')).toBeTruthy(); });\nit('talent-only check', () => { expect(1).toBe(1); });\n";
+    writeFileSync(join(talent, 'tests', 'talent-og.test.tsx'), custom);
     const routeEra = run(['--input-type=module', '--eval', "const { migrateSites } = await import('./scripts/migrate-showcase-pseo.mjs'); await migrateSites({ onlySlugs: ['talent'] });"]);
     assert.equal(routeEra.status, 0, routeEra.stdout + routeEra.stderr);
+    assert.equal(readFileSync(join(talent, 'tests', 'talent-og.test.tsx'), 'utf8'), custom, 'migration keeps a site-specific test');
+    assert.match(routeEra.stderr, /Review by hand: .*talent-og\.test\.tsx/);
+    rmSync(join(talent, 'tests', 'talent-og.test.tsx'));
+    assert.ok(existsSync(join(talent, 'lib', 'og-manifest.json')), 'migration writes the og manifest');
     assert.ok(!existsSync(join(talent, 'app', 'og.png')), 'migration removes the app/og.png route handler');
     assert.ok(existsSync(join(talent, 'public', 'og.png')), 'migration writes the static public/og.png');
     assert.doesNotMatch(readFileSync(join(talent, 'tests', 'opengraph.test.tsx'), 'utf8'), /@\/app\/og\.png\/route/);
