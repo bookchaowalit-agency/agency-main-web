@@ -51,7 +51,7 @@ baseline repository. See the root deployment registry for the live aliases.
   gets the files in `templates/site/` verbatim: the shared CI caller
   (platform-ci-workflows v1.1.1, coverage gate), ESLint, Vitest config and tests,
   browser-only Sentry, the home page and `lib/readiness.ts`. Its `package.json`
-  uses this repository's dependency set (Next.js 16.4.2, `eslint-config-next` as a
+  uses this repository's dependency set (Next.js 16.4.5, `eslint-config-next` as a
   devDependency) so the copied lockfile matches. The copies are owned per repo
   afterwards, not a shared package; `tests/generate-showcase-sites.test.mjs` checks
   that one generated site passes its own tsc, ESLint and Vitest.
