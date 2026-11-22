@@ -23,11 +23,11 @@ describe('portfolio pages', () => {
     expect(html).not.toMatch(/<form/);
   });
 
-  it('home shows three real verticals and the shared footer, without a sitewide link to bookchaowalit.com', () => {
+  it('home shows three real verticals, the shared footer, and a return link to bookchaowalit.com', () => {
     const html = renderToString(<HomePage />);
     for (const slug of ['talent', 'cyber-security', 'governance-risk']) expect(html).toContain(`href="/agencies/${slug}"`);
     expect(html).toContain('class="site-footer"');
-    expect(html).not.toContain('href="https://bookchaowalit.com"');
+    expect(html).toMatch(/<nav class="site-links"[^>]*><a href="https:\/\/bookchaowalit\.com">bookchaowalit\.com<\/a>/);
     expect(html).toMatch(/<h1 lang="en"/);
     // The header brand returns to the home page from every page.
     expect(html).toMatch(/class="site-brand" href="\/"/);
@@ -93,15 +93,15 @@ describe('Wave 1 internal links', () => {
   });
 });
 
-describe('pSEO link plan (Phase 3a): one portfolio <-> hub link, on the services page only', () => {
+describe('pSEO link plan (Phase 3a): contextual links and shared hub return navigation', () => {
   const hub = /href="https:\/\/bookchaowalit\.com\/?"/g;
-  it('the services page links bookchaowalit.com once, in its content, not in the footer', () => {
+  it('the services page keeps its contextual hub link and the shared return link', () => {
     const html = renderToString(<ServicesPage />);
-    expect(html.match(hub)).toHaveLength(1);
-    expect(html.slice(html.lastIndexOf('<footer'))).not.toMatch(hub);
+    expect(html.match(hub)).toHaveLength(2);
+    expect(html.slice(html.lastIndexOf('<footer'))).toMatch(hub);
   });
 
-  it('no other page links bookchaowalit.com; every footer keeps Privacy and Status', async () => {
+  it('every representative page puts the hub first in shared site links and keeps Privacy and Status', async () => {
     const service = agencyPseoServices[0];
     const pages = [
       renderToString(<HomePage />),
@@ -112,7 +112,7 @@ describe('pSEO link plan (Phase 3a): one portfolio <-> hub link, on the services
       renderToString(<SolutionsPage />),
     ];
     for (const html of pages) {
-      expect(html).not.toMatch(hub);
+      expect(html).toMatch(/<nav class="site-links"[^>]*><a href="https:\/\/bookchaowalit\.com">bookchaowalit\.com<\/a>/);
       expect(html).toContain('href="https://bookchaowalit.com/privacy"');
       expect(html).toContain('href="https://monitor.bookchaowalit.com/"');
     }
