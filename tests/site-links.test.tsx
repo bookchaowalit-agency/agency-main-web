@@ -6,7 +6,7 @@ import HomePage from '@/app/page';
 import AgenciesPage from '@/app/agencies/page';
 
 // Interface coverage (ADR-0015 §1.2, marketing site) and the ADR-0007 12px floor.
-const LINKS = ['https://bookchaowalit.com/privacy', 'https://monitor.bookchaowalit.com/', 'mailto:bookchaowalit.work@gmail.com'];
+const LINKS = ['https://bookchaowalit.com', 'https://bookchaowalit.com/privacy', 'https://monitor.bookchaowalit.com/', 'mailto:bookchaowalit.work@gmail.com'];
 
 function cssFiles(dir: string): string[] {
   return readdirSync(dir).flatMap((n) => {
@@ -16,10 +16,20 @@ function cssFiles(dir: string): string[] {
 }
 
 describe('site links and text floor', () => {
-  it('home and directory pages link privacy, status and contact', () => {
+  it('home and directory pages put the company hub first, followed by privacy, status and contact', () => {
     for (const html of [renderToString(<HomePage />), renderToString(<AgenciesPage />)]) {
-      for (const href of LINKS) expect(html).toContain(`href="${href}"`);
+      const nav = html.match(/<nav class="site-links"[^>]*>(.*?)<\/nav>/)?.[1];
+      expect(nav).toBeDefined();
+      expect(nav).toContain('>bookchaowalit.com</a>');
+      const positions = LINKS.map((href) => nav!.indexOf(`href="${href}"`));
+      expect(positions.every((position) => position >= 0)).toBe(true);
+      expect(positions).toEqual([...positions].sort((a, b) => a - b));
     }
+  });
+
+  it('keeps site link tap targets at least 44px high', () => {
+    const css = readFileSync('app/globals.css', 'utf8');
+    expect(css).toMatch(/\.site-links a \{[^}]*min-height: 44px/);
   });
 
   it('no stylesheet sets text below 12px', () => {

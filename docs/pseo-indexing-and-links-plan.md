@@ -62,7 +62,8 @@ action จะลามถึงทุกเว็บใน account เดีย�
 ### 3a. Internal (ควบคุมได้ 100%)
 - Hub ↔ services ↔ industries ↔ solutions ลิงก์ตาม relevance จริง (มีอยู่แล้ว — ตรวจไม่มีหน้าโดดเดี่ยว)
 - bookchaowalit.com (portfolio) → agency hub: 1 ลิงก์ที่หน้า services/about + จาก case studies ที่เกี่ยวข้อง
-- ห้าม sitewide footer links ข้ามทุกเว็บ / anchor text ที่ยัด keyword
+- agency hub → bookchaowalit.com: shared `.site-links` ใส่ลิงก์ชื่อแบรนด์เป็นรายการแรกทุกหน้า เพื่อให้กลับไปเว็บหลักได้; ข้อยกเว้นนี้ใช้เฉพาะ `agency-main-web` และไม่คัดลอกไปยัง 14 vertical sites
+- ห้าม sitewide footer links ข้าม 14 vertical sites / anchor text ที่ยัด keyword
 
 ### 3b. Earned backlinks (เป้า 10–15 referring domains คุณภาพใน 90 วัน)
 | ช่องทาง | งาน | เป้า/เดือน |
