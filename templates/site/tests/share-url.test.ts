@@ -23,7 +23,8 @@ describe('share image URL', () => {
 
   it('leaves canonical links on the configured public URL', async () => {
     const { canonicalUrl, siteConfig } = await loadConfig('http://localhost:3010');
-    expect(siteConfig.metadataUrl).toBe('http://localhost:3010');
+    expect(siteConfig.publicUrl).toBe('http://localhost:3010');
+    expect(siteConfig.metadataUrl).toBe(siteConfig.publicUrl);
     expect(canonicalUrl('/services')).toMatch(/^http:\/\/localhost:3010\/services\/?$/);
   });
 
