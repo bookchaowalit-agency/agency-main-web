@@ -10,7 +10,9 @@ function Artifact() {
 
   switch (site.design.motif as string) {
     case 'editorial':
-      return <div className="artifact artifact-editorial" aria-hidden="true"><span>NO. {String(site.number).padStart(2, '0')} / role scorecard</span><strong>Role scorecard</strong><ol className="editorial-rows"><li>ผลลัพธ์ที่ role ต้องส่ง</li><li>หลักฐานที่ใช้ตัดสินแต่ละข้อ</li><li>ผู้ตัดสินใจและจุดส่งต่อ</li></ol><i /><em>fit / proof / handoff</em></div>;
+      // The scorecard example carries content (what a role must deliver, the proof, the handoff), so screen readers
+      // read it as a named figure; only the issue number and the rule line are decoration.
+      return <div className="artifact artifact-editorial" role="figure" aria-label="ตัวอย่าง Role scorecard"><span aria-hidden="true">NO. {String(site.number).padStart(2, '0')} / role scorecard</span><strong lang="en">Role scorecard</strong><ol className="editorial-rows"><li>ผลลัพธ์ที่ role ต้องส่ง</li><li>หลักฐานที่ใช้ตัดสินแต่ละข้อ</li><li>ผู้ตัดสินใจและจุดส่งต่อ</li></ol><i aria-hidden="true" /><em lang="en">fit / proof / handoff</em></div>;
     case 'terminal':
       return <div className="artifact artifact-terminal" aria-hidden="true"><div className="terminal-top">READINESS_CONSOLE / {site.stage}</div>{labels.map((label, index) => <div className="terminal-row" key={label}><span>{String(index + 1).padStart(2, '0')}</span><strong>{label}</strong><i /></div>)}<small>status: inspectable</small></div>;
     case 'blueprint':

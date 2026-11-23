@@ -18,6 +18,8 @@ function parsePublicUrl(value: string | undefined) {
 }
 
 const publicUrl = parsePublicUrl(configuredUrl);
+// A loopback base (a local build with NEXT_PUBLIC_SITE_URL=http://localhost:3010) must never reach share images.
+const isLoopback = (value: string) => /^https?:\/\/(localhost|127\.\d+\.\d+\.\d+|\[::1\])(:\d+)?$/i.test(value);
 // The site's own production domain (lib/site.ts): absolute URLs in metadata (og:image, twitter:image) fall back to it,
 // never to localhost. Canonical links and indexing still need the approved NEXT_PUBLIC_SITE_URL.
 const productionUrl = parsePublicUrl(site.design.productionUrl);
@@ -28,7 +30,7 @@ export const siteConfig = {
   description: site.promise,
   publicUrl,
   productionUrl,
-  metadataUrl: publicUrl ?? productionUrl,
+  metadataUrl: publicUrl && !isLoopback(publicUrl) ? publicUrl : productionUrl,
   isIndexable: Boolean(publicUrl) && process.env.NEXT_PUBLIC_SITE_INDEXABLE === 'true',
 } as const;
 

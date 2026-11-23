@@ -10,7 +10,8 @@ export default function SiteLinks() {
     <nav className="site-links" aria-label="ลิงก์เว็บไซต์">
       <a href="https://bookchaowalit.com/privacy">Privacy</a>
       <a href="https://monitor.bookchaowalit.com/">Status</a>
-      <a href={contactHref}>Contact</a>
+      {/* Intake on a showcase site is closed, so the footer mail link is for feedback about the site, and says so. */}
+      <a href={contactHref}>Site feedback</a>
     </nav>
   );
 }

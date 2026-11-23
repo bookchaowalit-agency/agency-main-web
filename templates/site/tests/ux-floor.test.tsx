@@ -38,8 +38,10 @@ describe('UX floor', () => {
   it('gives each readiness state a next step without inviting an inquiry before the gate opens', () => {
     const html = renderToString(<Home />);
     expect(html).toContain('ดูทั้ง 14 กลุ่มงาน');
-    // The readiness note must not invite an email inquiry; the only mailto is the footer Contact link.
+    // The readiness note must not invite an email inquiry; the only mailto is the footer feedback link, labelled as such.
     expect(html.match(/href="mailto:/g)).toHaveLength(1);
+    expect(html).toContain('href="mailto:bookchaowalit.work@gmail.com">Site feedback</a>');
+    expect(html).not.toContain('>Contact</a>');
     if ((site.status as AgencyStatus) === 'locked') expect(html).toContain('ยังไม่เปิดรับงาน');
     else expect(html).not.toContain('ยังไม่เปิดรับงาน');
   });
