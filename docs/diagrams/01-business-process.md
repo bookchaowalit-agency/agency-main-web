@@ -16,7 +16,7 @@ flowchart LR
   EXISTS -->|yes| REFUSE["throws: Refusing to overwrite existing directory"]
   EXISTS -->|no| SIBLING["writes sibling repo: templates/site verbatim + vertical design + pSEO migration"]
   OWNER -->|"manual: node scripts/migrate-showcase-pseo.mjs"| UPDATE["updates service page, metadata, sitemap, robots in existing siblings"]
-  MAIN --> BUILD["next build: static export out/ (14 agency pages, 14 services, 6 industries, 6 solutions, 3 hubs)"]
+  PUSH -.->|"build and deploy path is separate from ci.yml [ต้องยืนยัน]"| BUILD["next build: static export out/ (14 agency pages, 14 services, 6 industries, 6 solutions, 3 hubs)"]
   BUILD --> GATE{"NEXT_PUBLIC_SITE_URL valid AND NEXT_PUBLIC_SITE_INDEXABLE=true?"}
   GATE -->|"no (default)"| NOIDX["noindex,nofollow everywhere; robots Disallow /; sitemap empty"]
   GATE -->|yes| PAGE{"pSEO page path in approvedPseoPaths?"}
@@ -25,7 +25,7 @@ flowchart LR
   BUILD -.->|"hosting: README says never deployed, pseo plan says Vercel agency-main-web [ต้องยืนยัน]"| HOST["Vercel static host"]
   VIS["visitor"] --> HOST
   HOST -->|"browser exception"| DSN{"NEXT_PUBLIC_SENTRY_DSN set?"}
-  DSN -->|"yes"| SENTRY["scrubbed event to Sentry"]
+  DSN -->|"yes"| SENTRY["scrubEvent drops request, user, breadcrumbs, extra, frame vars, non-platform contexts; strips ?query/#hash from message, tags, file names"]
   DSN -->|"no (README: no DSN anywhere)"| NONE["nothing sent"]
 ```
 
@@ -36,6 +36,7 @@ Sources: `.github/workflows/ci.yml`, `scripts/generate-showcase-sites.mjs`, `scr
 - `approvedPseoPaths` ใน `lib/pseo-indexing.ts` มี 6 path (Wave 1, owner อนุมัติ 2026-11-07) เป็น fail-closed: pSEO page ใหม่เป็น noindex และไม่อยู่ใน sitemap จนกว่าจะเพิ่ม path ในรายการนั้น แม้เปิด global flag แล้ว
 - `ci.yml` ไม่มี deploy step; สถานะ hosting ขัดกันเอง: `README.md` / `PRODUCT.md` บอกว่า repo นี้ไม่มี Vercel project และไม่ถูก deploy, ส่วน `docs/pseo-indexing-and-links-plan.md` (O1, 2026-11-07) บอกว่า Vercel project `agency-main-web` deploy ด้วย CLI ที่ `agency.bookchaowalit.com` โดยยังไม่ตั้ง `NEXT_PUBLIC_SITE_INDEXABLE` [ต้องยืนยัน]
 - generator ไม่เขียนทับ directory เดิม (throw) และ sibling 14 repo ถูกปรับด้วยมือใน batch b-website ไม่ได้สร้างจาก generator (README)
+- `scrubEvent` (`lib/sentry.ts`) ตัด request, user, breadcrumbs, extra, vars ใน stack frame และ context ที่ไม่ใช่ platform; ตัด ?query/#hash จาก message, tag, ชื่อไฟล์ (ไม่ได้ตัดข้อความ error ส่วนอื่น)
 - Sentry เชื่อมแต่ไม่ทำงานถ้าไม่มี DSN; README บอกว่าไม่มี DSN ที่ไหนเลย แต่ถ้า project บน Vercel มีจริงต้องตรวจ [ต้องยืนยัน]
 
 ## To-Be (docs/pseo-indexing-and-links-plan.md)
