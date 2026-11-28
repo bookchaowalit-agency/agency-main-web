@@ -263,3 +263,4 @@ a { color: inherit; }
 @media (max-width: 900px) { .pricing-grid-3 { grid-template-columns: 1fr; } }
 @media (max-width: 680px) { .pricing-grid { grid-template-columns: 1fr; } .price-actions .button { width: 100%; } }
 .pricing-page .hero-aside > strong { font-size: clamp(28px, 3.6vw, 40px); letter-spacing: 0; line-height: 1.25; }
+.pricing-grid:not(.pricing-grid-3) > .price-card:last-child:nth-child(odd) { grid-column: 1 / -1; }

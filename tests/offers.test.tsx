@@ -23,6 +23,8 @@ describe('offer data', () => {
     for (const offer of buildOffers) {
       expect(offer.depositThb * 2, offer.id).toBe(offer.fromThb);
       expect(offer.toThb, offer.id).toBeGreaterThan(offer.fromThb);
+      // The page states the care price once for every offer.
+      expect(offer.maintenanceThb, offer.id).toBe(buildOffers[0].maintenanceThb);
     }
   });
 
@@ -47,7 +49,7 @@ describe('pricing, terms and thank-you pages', () => {
     seoPlans.forEach((plan, i) => {
       const card = cards[buildOffers.length + i];
       expect(card).toContain(`id="${plan.id}-name"`);
-      expect(card).toContain(`href="${plan.thbUrl}" rel="noopener">ชำระ ${formatThb(plan.thb)}<`);
+      expect(card).toContain(`href="${plan.thbUrl}" rel="noopener">ชำระเป็นเงินบาท<`);
       expect(card).toContain(`href="${plan.usdUrl}" rel="noopener" lang="en">Pay in USD ($${plan.usd})`);
     });
     expect(html).toContain('href="/terms"');

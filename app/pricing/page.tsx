@@ -13,9 +13,12 @@ export const metadata = pageMetadata(
 const steps = [
   'ส่งอีเมลเล่าโจทย์และงานที่อยากให้ระบบช่วย',
   'คุยขอบเขต แล้วได้ใบเสนอราคาที่ระบุราคาสุดท้ายในช่วงราคาที่แสดงไว้',
-  'ชำระมัดจำ 50% ของราคาเริ่มต้นผ่าน Stripe เพื่อเริ่มงาน (ยอดมัดจำคงที่ตามที่แสดง แม้ราคาสุดท้ายสูงกว่าราคาเริ่มต้น)',
+  'ชำระมัดจำผ่าน Stripe เพื่อเริ่มงาน ยอดมัดจำคงที่ตามปุ่มบนการ์ด แม้ราคาสุดท้ายสูงกว่าราคาเริ่มต้น',
   'ส่งมอบงาน ชำระส่วนที่เหลือตามใบเสนอราคา แล้วเลือกได้ว่าจะใช้บริการดูแลรายเดือนหรือไม่',
 ];
+
+// Every build offer shares one monthly care price (tests/offers.test.tsx), so the page states it once.
+const careThb = buildOffers[0].maintenanceThb;
 
 export default function PricingPage() {
   return (
@@ -26,7 +29,7 @@ export default function PricingPage() {
           <div>
             <p className="eyebrow">PRICING</p>
             <h1 id="pricing-title">ราคาชัดเจน<br /><em>จ่ายออนไลน์ได้ทันที</em></h1>
-            <p className="lede">ราคาด้านล่างเป็นราคาเริ่มต้นจริง ชำระผ่าน Stripe ด้วยบัตรหรือ PromptPay (รายการรายเดือนตัดผ่านบัตรเท่านั้น)</p>
+            <p className="lede">ราคาด้านล่างเป็นราคาเริ่มต้นจริง ชำระผ่าน Stripe ด้วยบัตรหรือ PromptPay ส่วนรายการรายเดือนตัดผ่านบัตรเท่านั้น</p>
           </div>
           <aside className="hero-aside">
             <p className="eyebrow">ก่อนชำระมัดจำ</p>
@@ -37,7 +40,7 @@ export default function PricingPage() {
         </section>
 
         <section className="pricing-section" aria-labelledby="build-title">
-          <div className="section-heading"><div><p className="eyebrow">BUILD + CARE</p><h2 id="build-title">งานระบบสำหรับธุรกิจ</h2></div><p>ราคาสุดท้ายขึ้นกับฟีเจอร์และขอบเขต ซึ่งจะอยู่ในใบเสนอราคาก่อนเริ่มงานเสมอ</p></div>
+          <div className="section-heading"><div><p className="eyebrow">BUILD + CARE</p><h2 id="build-title">งานระบบสำหรับธุรกิจ</h2></div><p>มัดจำคือครึ่งหนึ่งของราคาเริ่มต้น ราคาสุดท้ายอยู่ในใบเสนอราคาก่อนเริ่มงานเสมอ หลังส่งมอบเลือกสมัครดูแลระบบได้ {formatThb(careThb)} ต่อเดือนทุกงาน ไม่บังคับ</p></div>
           <div className="pricing-grid">
             {buildOffers.map((offer) => (
               <article className="price-card" key={offer.id} aria-labelledby={`${offer.id}-name`}>
@@ -45,11 +48,7 @@ export default function PricingPage() {
                 <h3 id={`${offer.id}-name`}>{offer.thaiName}</h3>
                 <p className="price-summary">{offer.summary}</p>
                 <p className="price-main"><span>เริ่มต้น</span> {formatThb(offer.fromThb)}</p>
-                <p className="price-range">ช่วงราคา {formatThb(offer.fromThb)}–{formatThb(offer.toThb)}</p>
-                <dl className="price-terms">
-                  <div><dt>มัดจำเริ่มงาน (50% ของราคาเริ่มต้น)</dt><dd>{formatThb(offer.depositThb)}</dd></div>
-                  <div><dt>ดูแลระบบหลังส่งมอบ</dt><dd>{formatThb(offer.maintenanceThb)}/เดือน</dd></div>
-                </dl>
+                <p className="price-range">สูงสุดราว {formatThb(offer.toThb)} ตามขอบเขต</p>
                 <div className="price-actions">
                   <a className="button button-dark" href={offer.depositUrl} rel="noopener">ชำระมัดจำ {formatThb(offer.depositThb)}</a>
                   <a className="text-link" href={offer.maintenanceUrl} rel="noopener">สมัครดูแลรายเดือน <span aria-hidden="true">→</span></a>
@@ -69,7 +68,7 @@ export default function PricingPage() {
                 <p className="price-summary">{plan.detail}</p>
                 <p className="price-main">{formatThb(plan.thb)}{plan.monthly ? <span>/เดือน</span> : null}</p>
                 <div className="price-actions">
-                  <a className="button button-dark" href={plan.thbUrl} rel="noopener">ชำระ {formatThb(plan.thb)}</a>
+                  <a className="button button-dark" href={plan.thbUrl} rel="noopener">ชำระเป็นเงินบาท</a>
                   <a className="text-link" href={plan.usdUrl} rel="noopener" lang="en">Pay in USD (${plan.usd}) <span aria-hidden="true">→</span></a>
                 </div>
               </article>
