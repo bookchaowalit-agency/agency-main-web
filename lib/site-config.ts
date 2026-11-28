@@ -37,13 +37,34 @@ export function canonicalUrl(path: string) {
   return siteConfig.publicUrl ? absoluteUrl(path) : undefined;
 }
 
+// Shared 1200x630 social card (public/og.png, made with content-production `art template card --brand agency`).
+export const ogImage = { url: '/og.png', width: 1200, height: 630, alt: 'Solo Empire Group — Specialist Agencies' } as const;
+
+// Only announce the card when the build has a public origin: without one metadataBase is localhost and
+// crawlers would be sent to an image they cannot fetch.
+// Crawlers cannot fetch an image from a loopback or plain-http origin, so those builds get no image card.
+function isShareableOrigin(url: string | undefined) {
+  if (!url) return false;
+  const { protocol, hostname } = new URL(url);
+  const loopback = hostname === 'localhost' || hostname.endsWith('.localhost') || hostname === '[::1]' || /^127\./.test(hostname) || hostname === '0.0.0.0';
+  return protocol === 'https:' && !loopback;
+}
+
+export function socialCard(title: string, description: string): Pick<Metadata, 'openGraph' | 'twitter'> {
+  return isShareableOrigin(publicUrl)
+    ? {
+        openGraph: { type: 'website', title, description, images: [ogImage] },
+        twitter: { card: 'summary_large_image', title, description, images: [ogImage.url] },
+      }
+    : { openGraph: { type: 'website', title, description }, twitter: { card: 'summary', title, description } };
+}
+
 export function pageMetadata(title: string, description: string, path: string): Metadata {
   const canonical = canonicalUrl(path);
   return {
     title,
     description,
-    openGraph: { type: 'website', title, description },
-    twitter: { card: 'summary', title, description },
+    ...socialCard(title, description),
     ...(canonical ? { alternates: { canonical } } : {}),
     // An unapproved pSEO page on an indexable site stays out of the index but still passes its internal links.
     robots: !siteConfig.isIndexable

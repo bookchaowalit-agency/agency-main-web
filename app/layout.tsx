@@ -2,7 +2,7 @@ import type { Metadata } from 'next';
 import localFont from 'next/font/local';
 import type { ReactNode } from 'react';
 import './globals.css';
-import { siteConfig } from '@/lib/site-config';
+import { siteConfig, socialCard } from '@/lib/site-config';
 
 const notoSansThai = localFont({
   src: [
@@ -26,6 +26,10 @@ const notoSerifThai = localFont({
   adjustFontFallback: 'Times New Roman',
 });
 
+const siteTitle = 'Solo Empire Group — Specialist Agencies';
+const siteDescription = 'Fourteen specialist agency verticals built on one shared core.';
+const card = socialCard(siteTitle, siteDescription);
+
 export const metadata: Metadata = {
   metadataBase: new URL(siteConfig.metadataUrl),
   title: {
@@ -33,14 +37,12 @@ export const metadata: Metadata = {
     template: '%s — Solo Empire Group',
   },
   description: 'Fourteen specialist agency verticals built on one shared core.',
+  ...card,
   openGraph: {
-    type: 'website',
+    ...card.openGraph,
     locale: 'th_TH',
     siteName: 'Solo Empire Group',
-    title: 'Solo Empire Group — Specialist Agencies',
-    description: 'Fourteen specialist agency verticals built on one shared core.',
   },
-  twitter: { card: 'summary', title: 'Solo Empire Group — Specialist Agencies', description: 'Fourteen specialist agency verticals built on one shared core.' },
   ...(siteConfig.publicUrl ? { alternates: { canonical: siteConfig.publicUrl } } : {}),
   ...(siteConfig.isIndexable
     ? { robots: { index: true, follow: true } }
