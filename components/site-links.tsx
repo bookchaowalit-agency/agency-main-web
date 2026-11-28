@@ -7,6 +7,7 @@ export default function SiteLinks() {
       <a href="https://bookchaowalit.com/privacy">Privacy</a>
       <a href="https://monitor.bookchaowalit.com/">Status</a>
       <a href="mailto:bookchaowalit.work@gmail.com">Contact</a>
+      <a href="/terms">Terms</a>
     </nav>
   );
 }

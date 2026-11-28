@@ -17,6 +17,8 @@ export default function sitemap(): MetadataRoute.Sitemap {
     '/services',
     '/industries',
     '/solutions',
+    '/pricing',
+    '/terms',
     ...agencyPseoServicePaths,
     ...pseoPilotPaths,
   ];

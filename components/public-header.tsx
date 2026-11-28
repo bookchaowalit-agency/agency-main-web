@@ -14,6 +14,7 @@ export function PublicHeader() {
         <Link href="/services">Services</Link>
         <Link href="/industries">Industries</Link>
         <Link href="/solutions">Problems</Link>
+        <Link href="/pricing">Pricing</Link>
       </NavScroller>
     </header>
   );

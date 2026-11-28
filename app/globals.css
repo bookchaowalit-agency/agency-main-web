@@ -238,3 +238,28 @@ a { color: inherit; }
   .pseo-directory-card { flex-direction: column; align-items: stretch; }
   .pseo-directory-card > span { align-self: flex-end; }
 }
+
+/* Pricing and terms */
+.pricing-section, .terms-section { padding-top: clamp(48px, 7vw, 80px); }
+.pricing-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; }
+.pricing-grid-3 { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+.price-card { display: flex; min-width: 0; flex-direction: column; padding: clamp(24px, 3vw, 32px); border-radius: var(--radius); background: var(--surface); box-shadow: var(--shadow); }
+.price-card h3 { margin-top: 8px; color: var(--ink); font-size: clamp(22px, 2.4vw, 28px); font-weight: 700; line-height: 1.35; overflow-wrap: anywhere; }
+.price-summary { margin-top: 12px; color: var(--muted); font-size: 16px; line-height: 1.6; }
+.price-main { margin-top: 20px; color: var(--ink); font-size: clamp(30px, 3.4vw, 40px); font-weight: 700; line-height: 1.25; }
+.price-main span { color: var(--muted); font-size: 16px; font-weight: 500; }
+.price-range { margin-top: 4px; color: var(--muted); font-size: 14px; line-height: 1.5; }
+.price-terms { margin: 16px 0 0; }
+.price-terms div { display: flex; justify-content: space-between; gap: 12px; padding: 10px 0; border-top: 1px solid var(--line-soft); font-size: 15px; line-height: 1.5; }
+.price-terms dt { color: var(--muted); }
+.price-terms dd { margin: 0; color: var(--ink); font-weight: 600; text-align: right; }
+.price-actions { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 20px; margin-top: auto; padding-top: 24px; }
+.pricing-note { max-width: 760px; margin-top: 24px; color: var(--muted); font-size: 14px; line-height: 1.7; }
+.pricing-note a, .terms-section a, .state-page p a, .lede a { color: var(--accent); }
+.terms-section { max-width: 760px; }
+.terms-section h2 { color: var(--ink); font-size: clamp(24px, 3vw, 32px); font-weight: 700; line-height: 1.35; }
+.terms-section ul { margin: 16px 0 0; padding-left: 20px; }
+.terms-section li, .terms-section p { margin-top: 10px; color: var(--ink); font-size: 16px; line-height: 1.7; overflow-wrap: anywhere; }
+@media (max-width: 900px) { .pricing-grid-3 { grid-template-columns: 1fr; } }
+@media (max-width: 680px) { .pricing-grid { grid-template-columns: 1fr; } .price-actions .button { width: 100%; } }
+.pricing-page .hero-aside > strong { font-size: clamp(28px, 3.6vw, 40px); letter-spacing: 0; line-height: 1.25; }

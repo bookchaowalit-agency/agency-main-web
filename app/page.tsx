@@ -23,6 +23,7 @@ export default function HomePage() {
           <Link href="/services">Services <span aria-hidden="true">›</span></Link>
           <Link href="/industries">Industries <span aria-hidden="true">›</span></Link>
           <Link href="/solutions">Problems <span aria-hidden="true">›</span></Link>
+          <Link href="/pricing">Pricing <span aria-hidden="true">›</span></Link>
         </div>
         <p className="home-note">หน้านี้เป็น portfolio preview สถานะของแต่ละ vertical จะแสดงตามความพร้อมจริง และยังไม่มี lead form หรือการรับข้อมูลลูกค้า</p>
         <SiteLinks />
