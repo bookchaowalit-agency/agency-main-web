@@ -6,7 +6,7 @@ import { CONTACT_EMAIL, mailtoFor } from '@/lib/offers';
 
 // Where Stripe Payment Links send the buyer after paying. Never indexed: it means nothing without a payment.
 export const metadata: Metadata = {
-  title: 'ชำระเงินเรียบร้อย',
+  title: 'ขอบคุณที่ชำระเงิน',
   description: 'ขอบคุณที่ชำระเงิน ขั้นตอนต่อไปหลังชำระ',
   robots: { index: false, follow: false },
 };
@@ -16,12 +16,12 @@ export default function ThankYouPage() {
     <div className="site-shell">
       <PublicHeader />
       <main id="main-content" className="public-page state-page">
-        <p className="eyebrow">PAYMENT RECEIVED</p>
-        <h1>ขอบคุณ ชำระเงินเรียบร้อยแล้ว</h1>
-        <p>Stripe ส่งใบเสร็จไปที่อีเมลที่คุณกรอกไว้แล้ว เราจะติดต่อกลับทางอีเมลภายใน 2 วันทำการ</p>
+        <p className="eyebrow">AFTER PAYMENT</p>
+        <h1>ขอบคุณที่ชำระเงิน</h1>
+        <p>หากคุณเพิ่งชำระผ่าน Stripe สำเร็จ ใบเสร็จจะส่งไปที่อีเมลที่กรอกไว้ และเราจะติดต่อกลับทางอีเมลภายใน 2 วันทำการ หากไม่ได้รับใบเสร็จ ส่งอีเมลมาพร้อมเวลาที่ชำระ เราจะตรวจสอบให้</p>
         <p>ถ้าเป็นรายงาน SEO ส่ง Search Console export มาที่ <a href={mailtoFor('ส่งข้อมูล Search Console')}>{CONTACT_EMAIL}</a> ได้เลย ถ้าเป็นงานระบบ ตอบอีเมลนั้นพร้อมรายละเอียดโจทย์หรือใบเสนอราคาที่ตกลงไว้</p>
         <Link className="text-link" href="/terms">ดูเงื่อนไขการยกเลิกและการคืนเงิน <span aria-hidden="true">→</span></Link>
-        <SiteFooter label="payment received" />
+        <SiteFooter label="after payment" />
       </main>
     </div>
   );

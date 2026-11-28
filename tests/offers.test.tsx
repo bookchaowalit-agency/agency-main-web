@@ -34,16 +34,22 @@ describe('offer data', () => {
 
 describe('pricing, terms and thank-you pages', () => {
   it('pricing shows every offer with its deposit and care links, and no form', () => {
-    const html = renderToString(<PricingPage />);
-    for (const offer of buildOffers) {
-      expect(html).toContain(`href="${offer.depositUrl}"`);
-      expect(html).toContain(`href="${offer.maintenanceUrl}"`);
-      expect(html).toContain(formatThb(offer.depositThb));
-    }
-    for (const plan of seoPlans) {
-      expect(html).toContain(`href="${plan.thbUrl}"`);
-      expect(html).toContain(`href="${plan.usdUrl}"`);
-    }
+    // React separates adjacent text parts with <!-- -->; drop them so a button reads as one label.
+    const html = renderToString(<PricingPage />).replaceAll('<!-- -->', '');
+    // Each card holds its own links on the right buttons: a swapped deposit/care or THB/USD link fails here.
+    const cards = html.split('<article').slice(1);
+    expect(cards).toHaveLength(buildOffers.length + seoPlans.length);
+    buildOffers.forEach((offer, i) => {
+      expect(cards[i]).toContain(`id="${offer.id}-name"`);
+      expect(cards[i]).toContain(`href="${offer.depositUrl}" rel="noopener">ชำระมัดจำ ${formatThb(offer.depositThb)}<`);
+      expect(cards[i]).toContain(`href="${offer.maintenanceUrl}" rel="noopener">สมัครดูแลรายเดือน`);
+    });
+    seoPlans.forEach((plan, i) => {
+      const card = cards[buildOffers.length + i];
+      expect(card).toContain(`id="${plan.id}-name"`);
+      expect(card).toContain(`href="${plan.thbUrl}" rel="noopener">ชำระ ${formatThb(plan.thb)}<`);
+      expect(card).toContain(`href="${plan.usdUrl}" rel="noopener" lang="en">Pay in USD ($${plan.usd})`);
+    });
     expect(html).toContain('href="/terms"');
     expect(html).not.toMatch(/<form/);
     expect(pricingMeta.title).toBeTruthy();
@@ -56,7 +62,7 @@ describe('pricing, terms and thank-you pages', () => {
   });
 
   it('thank-you page is never indexed and is not in the sitemap', () => {
-    expect(renderToString(<ThankYouPage />)).toContain('ชำระเงินเรียบร้อย');
+    expect(renderToString(<ThankYouPage />)).toContain('ขอบคุณที่ชำระเงิน');
     expect(thankYouMeta.robots).toEqual({ index: false, follow: false });
     expect(sitemap().map((entry) => entry.url).some((url) => url.endsWith('/thank-you'))).toBe(false);
   });

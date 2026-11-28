@@ -13,7 +13,7 @@ export const metadata = pageMetadata(
 const steps = [
   'ส่งอีเมลเล่าโจทย์และงานที่อยากให้ระบบช่วย',
   'คุยขอบเขต แล้วได้ใบเสนอราคาที่ระบุราคาสุดท้ายในช่วงราคาที่แสดงไว้',
-  'ชำระมัดจำ 50% ของราคาเริ่มต้นผ่าน Stripe เพื่อเริ่มงาน',
+  'ชำระมัดจำ 50% ของราคาเริ่มต้นผ่าน Stripe เพื่อเริ่มงาน (ยอดมัดจำคงที่ตามที่แสดง แม้ราคาสุดท้ายสูงกว่าราคาเริ่มต้น)',
   'ส่งมอบงาน ชำระส่วนที่เหลือตามใบเสนอราคา แล้วเลือกได้ว่าจะใช้บริการดูแลรายเดือนหรือไม่',
 ];
 
@@ -26,7 +26,7 @@ export default function PricingPage() {
           <div>
             <p className="eyebrow">PRICING</p>
             <h1 id="pricing-title">ราคาชัดเจน<br /><em>จ่ายออนไลน์ได้ทันที</em></h1>
-            <p className="lede">ราคาด้านล่างเป็นราคาเริ่มต้นจริง ชำระผ่าน Stripe ด้วยบัตรหรือ PromptPay และได้ใบเสร็จทางอีเมลอัตโนมัติ</p>
+            <p className="lede">ราคาด้านล่างเป็นราคาเริ่มต้นจริง ชำระผ่าน Stripe ด้วยบัตรหรือ PromptPay (รายการรายเดือนตัดผ่านบัตรเท่านั้น)</p>
           </div>
           <aside className="hero-aside">
             <p className="eyebrow">ก่อนชำระมัดจำ</p>
@@ -47,7 +47,7 @@ export default function PricingPage() {
                 <p className="price-main"><span>เริ่มต้น</span> {formatThb(offer.fromThb)}</p>
                 <p className="price-range">ช่วงราคา {formatThb(offer.fromThb)}–{formatThb(offer.toThb)}</p>
                 <dl className="price-terms">
-                  <div><dt>มัดจำเริ่มงาน 50%</dt><dd>{formatThb(offer.depositThb)}</dd></div>
+                  <div><dt>มัดจำเริ่มงาน (50% ของราคาเริ่มต้น)</dt><dd>{formatThb(offer.depositThb)}</dd></div>
                   <div><dt>ดูแลระบบหลังส่งมอบ</dt><dd>{formatThb(offer.maintenanceThb)}/เดือน</dd></div>
                 </dl>
                 <div className="price-actions">
@@ -60,7 +60,7 @@ export default function PricingPage() {
         </section>
 
         <section className="pricing-section" aria-labelledby="seo-title">
-          <div className="section-heading"><div><p className="eyebrow">SEO REPORT</p><h2 id="seo-title">รายงาน SEO จากข้อมูลจริง</h2></div><p>ใช้ข้อมูลจาก Google Search Console ของคุณ ไม่การันตีอันดับหรือ traffic และส่ง export ให้หลังชำระเงิน</p></div>
+          <div className="section-heading"><div><p className="eyebrow">SEO REPORT</p><h2 id="seo-title">รายงาน SEO จากข้อมูลจริง</h2></div><p>ใช้ข้อมูลจาก Google Search Console ของคุณ ไม่การันตีอันดับหรือ traffic หลังชำระเงิน ส่ง Search Console export มาให้เรา ระยะเวลาส่งงานนับจากวันที่ได้ข้อมูลครบ</p></div>
           <div className="pricing-grid pricing-grid-3">
             {seoPlans.map((plan) => (
               <article className="price-card" key={plan.id} aria-labelledby={`${plan.id}-name`}>
